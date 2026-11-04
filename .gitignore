@@ -1,0 +1,36 @@
+
+# .NET — arquivos de compilação
+**/bin/
+**/obj/
+
+# Node.js e React
+**/node_modules/
+**/dist/
+
+# Arquivos de ambiente e credenciais
+.env
+.env.*
+!.env.example
+**/appsettings.Development.json
+**/appsettings.Production.json
+**/secrets.json
+
+# Arquivos temporários e logs
+*.log
+*.tmp
+*.bak
+
+# Configurações locais de IDEs
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# Arquivos do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Resultados de testes
+**/TestResults/
+**/coverage/
