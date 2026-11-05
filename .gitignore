@@ -34,3 +34,7 @@ Thumbs.db
 # Resultados de testes
 **/TestResults/
 **/coverage/
+
+.env
+.env.*
+!.env.example
