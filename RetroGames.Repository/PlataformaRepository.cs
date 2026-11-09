@@ -1,9 +1,10 @@
 
 using RetroGames.Model.Model;
+using RetroGames.Repository.Interfaces;
 
 namespace RetroGames.Repository;
 
-public class PlataformaRepository : RepositoryBase
+public class PlataformaRepository : RepositoryBase, IPlataformaRepository
 {
     public PlataformaRepository(RepositoryConfig configuracao)
         : base(configuracao)
