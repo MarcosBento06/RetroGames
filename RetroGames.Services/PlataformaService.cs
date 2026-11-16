@@ -6,7 +6,7 @@ using RetroGames.Services.Interfaces;
 
 namespace RetroGames.Services;
 
-public class PlataformaService
+public class PlataformaService : IPlataformaService
 {
     private readonly IRepositorySet _repositorio;
 
