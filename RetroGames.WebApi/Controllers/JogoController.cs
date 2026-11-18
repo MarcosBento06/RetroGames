@@ -75,4 +75,66 @@ public class JogoController : ControllerBase
         return Ok(resposta);
     }
 
+
+    [HttpPost]
+    public async Task<IActionResult> Inserir(
+        [FromBody] InserirJogoRequestApiModel request)
+    {
+        var jogo = request.ParaModel();
+
+        var criado = await _servico.InserirAsync(
+            jogo,
+            request.IdsGeneros
+        );
+
+        var detalhe = await _servico.BuscarPorIdAsync(criado.Id);
+
+        var resposta = new RetroGamesResponseApiModel<
+            ListarPorIdJogoResponseApiModel>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = detalhe.ParaResponseDetalhe()
+        };
+
+        return CreatedAtAction(
+            nameof(ListarPorId),
+            new { id = criado.Id },
+            resposta
+        );
+    }
+
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Alterar(
+        int id,
+        [FromBody] AlterarJogoRequestApiModel request)
+    {
+        var jogo = request.ParaModel(id);
+
+        await _servico.AlterarAsync(
+            jogo,
+            request.IdsGeneros
+        );
+
+        var resposta = new RetroGamesResponseApiModel
+        {
+            ResponseCode = ResponseCodes.SUCESSO
+        };
+
+        return Ok(resposta);
+    }
+
+    [HttpDelete("{id:int}")]
+    public async Task<IActionResult> Excluir(int id)
+    {
+        await _servico.DesativarAsync(id);
+
+        var resposta = new RetroGamesResponseApiModel
+        {
+            ResponseCode = ResponseCodes.SUCESSO
+        };
+
+        return Ok(resposta);
+    }
+
+
 }
