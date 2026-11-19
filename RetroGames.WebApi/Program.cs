@@ -22,6 +22,7 @@ if (string.IsNullOrWhiteSpace(cadeiaConexao))
 
 builder.Services.AddRepositorios(cadeiaConexao);
 builder.Services.AddServicosDeNegocio();
+builder.Services.AddAutenticacao();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
@@ -85,6 +86,10 @@ if (app.Environment.IsDevelopment())
             "RetroGames API v1");
     });
 }
+
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 
