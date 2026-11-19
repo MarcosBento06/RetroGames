@@ -1,8 +1,10 @@
-
+using Microsoft.AspNetCore.Authorization;
+using RetroGames.WebApi.Configuration;
 using Microsoft.AspNetCore.Mvc;
 using RetroGames.Services.Interfaces;
 using RetroGames.WebApi.ApiModels;
 using RetroGames.WebApi.Mappers;
+
 
 namespace RetroGames.WebApi.Controllers;
 
@@ -18,6 +20,7 @@ public class PlataformaController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Listar()
     {
         var plataformas = await _servico.ListarAsync();
@@ -37,6 +40,7 @@ public class PlataformaController : ControllerBase
     }
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<IActionResult> ListarPorId(int id)
     {
         var plataforma = await _servico.BuscarPorIdAsync(id);
@@ -52,6 +56,7 @@ public class PlataformaController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Policy = Politicas.Administrador)]
     public async Task<IActionResult> Inserir(
         [FromBody] InserirPlataformaRequestApiModel request)
     {
@@ -74,6 +79,7 @@ public class PlataformaController : ControllerBase
     }
 
     [HttpPut("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
     public async Task<IActionResult> Alterar(
         int id,
         [FromBody] AlterarPlataformaRequestApiModel request)
@@ -91,6 +97,7 @@ public class PlataformaController : ControllerBase
     }
 
     [HttpDelete("{id:int}")]
+    [Authorize(Policy = Politicas.Administrador)]
     public async Task<IActionResult> Excluir(int id)
     {
         await _servico.ExcluirAsync(id);

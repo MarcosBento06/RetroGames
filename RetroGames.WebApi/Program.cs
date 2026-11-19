@@ -23,6 +23,7 @@ if (string.IsNullOrWhiteSpace(cadeiaConexao))
 builder.Services.AddRepositorios(cadeiaConexao);
 builder.Services.AddServicosDeNegocio();
 builder.Services.AddAutenticacao();
+builder.Services.AddAutorizacao();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
@@ -77,7 +78,7 @@ app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi().AllowAnonymous();
 
     app.UseSwaggerUI(opcoes =>
     {
