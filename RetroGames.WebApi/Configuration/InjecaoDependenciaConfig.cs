@@ -6,6 +6,7 @@ using RetroGames.Repository;
 using RetroGames.Repository.Interfaces;
 using RetroGames.Services;
 using RetroGames.Services.Interfaces;
+using RetroGames.WebApi.Services;
 
 namespace RetroGames.WebApi.Configuration;
 
@@ -41,6 +42,9 @@ public static class InjecaoDependenciaConfig
 
         services.AddScoped<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
         services.AddScoped<IAutenticacaoService, AutenticacaoService>();
+
+        services.AddHttpContextAccessor();
+        services.AddScoped<IUsuarioAtualService, UsuarioAtualService>();    
 
         return services;
     }

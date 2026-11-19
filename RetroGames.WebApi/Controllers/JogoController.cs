@@ -1,5 +1,6 @@
 
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using RetroGames.Services.Interfaces;
 using RetroGames.WebApi.ApiModels;
 using RetroGames.WebApi.Mappers;
@@ -18,6 +19,7 @@ public class JogoController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<IActionResult> Listar(
         [FromQuery] ListarJogoRequestApiModel request)
     {
@@ -59,6 +61,7 @@ public class JogoController : ControllerBase
 
 
     [HttpGet("{id:int}")]
+    [AllowAnonymous]
     public async Task<IActionResult> ListarPorId(int id)
     {
         var jogo = await _servico.BuscarPorIdAsync(id);
