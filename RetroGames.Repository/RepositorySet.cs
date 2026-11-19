@@ -15,16 +15,21 @@ public class RepositorySet : IRepositorySet
 
     public ICondicaoJogoRepository CondicaoJogo { get; }
 
-    public RepositorySet(RepositoryConfig configuracao)
+    public IUsuarioRepository Usuario { get; }
+
+    public RepositorySet(
+        IPlataformaRepository plataforma,
+        IJogoRepository jogo,
+        IJogoGeneroRepository jogoGenero,
+        IGeneroRepository genero,
+        ICondicaoJogoRepository condicaoJogo,
+        IUsuarioRepository usuario)
     {
-        Plataforma = new PlataformaRepository(configuracao);
-
-        Jogo = new JogoRepository(configuracao);
-
-        JogoGenero = new JogoGeneroRepository(configuracao);
-
-        Genero = new GeneroRepository(configuracao);
-
-        CondicaoJogo = new CondicaoJogoRepository(configuracao);
+        Plataforma = plataforma;
+        Jogo = jogo;
+        JogoGenero = jogoGenero;
+        Genero = genero;
+        CondicaoJogo = condicaoJogo;
+        Usuario = usuario;
     }
 }
