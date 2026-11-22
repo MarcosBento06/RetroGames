@@ -3,7 +3,7 @@ import { Route, Routes } from 'react-router-dom'
 
 import Layout from './components/Layout'
 import Catalogo from './pages/Catalogo/Catalogo'
-import DetalheJogo from './pages/DetalheJogo'
+import DetalheJogo from './pages/Catalogo/DetalheJogo'
 import NaoEncontrada from './pages/NaoEncontrada'
 
 function App() {
