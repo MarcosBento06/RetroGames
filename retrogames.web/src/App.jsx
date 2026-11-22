@@ -2,7 +2,7 @@
 import { Route, Routes } from 'react-router-dom'
 
 import Layout from './components/Layout'
-import Catalogo from './pages/Catalogo'
+import Catalogo from './pages/Catalogo/Catalogo'
 import DetalheJogo from './pages/DetalheJogo'
 import NaoEncontrada from './pages/NaoEncontrada'
 
