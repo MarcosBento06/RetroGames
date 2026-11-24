@@ -29,7 +29,7 @@ public class JogoController : ControllerBase
             busca: filtro.Busca,
             idPlataforma: filtro.IdPlataforma,
             idGenero: filtro.IdGenero,
-            incluirInativos: false,
+            incluirInativos: request.IncluirInativos && User.IsInRole("Administrador"),
             pagina: filtro.Pagina,
             tamanhoPagina: filtro.TamanhoPagina
         );

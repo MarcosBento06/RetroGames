@@ -9,11 +9,8 @@ import DetalheJogo from './pages/Catalogo/DetalheJogo'
 import NaoEncontrada from './pages/NaoEncontrada'
 import Login from './pages/Login/Login'
 import Plataforma from './pages/Auxiliares/Plataforma'
-
-// Telas provisórias da administração
-function PaginaProvisoria({ titulo }) {
-  return <h1>{titulo}</h1>
-}
+import Jogos from './pages/Administracao/Jogos'
+import FormularioJogo from './pages/Administracao/FormularioJogo'
 
 function App() {
   return (
@@ -34,25 +31,16 @@ function App() {
           path="/admin"
           element={<RotaProtegida somenteAdministrador />}
         >
-          <Route
-            path="jogos"
-            element={
-              <PaginaProvisoria titulo="Administração de Jogos" />
-            }
-          />
+          <Route path="jogos" element={<Jogos />} />
 
           <Route
             path="jogos/novo"
-            element={
-              <PaginaProvisoria titulo="Cadastrar Jogo" />
-            }
+            element={<FormularioJogo />}
           />
 
           <Route
             path="jogos/:id/editar"
-            element={
-              <PaginaProvisoria titulo="Editar Jogo" />
-            }
+            element={<FormularioJogo />}
           />
 
           <Route
