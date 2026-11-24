@@ -8,6 +8,7 @@ import Catalogo from './pages/Catalogo/Catalogo'
 import DetalheJogo from './pages/Catalogo/DetalheJogo'
 import NaoEncontrada from './pages/NaoEncontrada'
 import Login from './pages/Login/Login'
+import Plataforma from './pages/Auxiliares/Plataforma'
 
 // Telas provisórias da administração
 function PaginaProvisoria({ titulo }) {
@@ -55,10 +56,8 @@ function App() {
           />
 
           <Route
-            path="plataformas"
-            element={
-              <PaginaProvisoria titulo="Administração de Plataformas" />
-            }
+              path="plataformas"
+              element={<Plataforma />}
           />
         </Route>
 
