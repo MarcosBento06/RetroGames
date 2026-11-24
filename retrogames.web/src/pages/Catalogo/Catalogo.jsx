@@ -35,7 +35,6 @@ function Catalogo() {
       : 1
 
   // Estado dos filtros
-  const [textoBusca, setTextoBusca] = useState(busca)
   const [plataformas, setPlataformas] = useState([])
   const [generos, setGeneros] = useState([])
   const [carregandoFiltros, setCarregandoFiltros] = useState(true)
@@ -48,10 +47,6 @@ function Catalogo() {
   const [erroJogos, setErroJogos] = useState('')
   const [tentativasJogos, setTentativasJogos] = useState(0)
 
-  // Sincroniza o campo de busca com a URL
-  useEffect(() => {
-    setTextoBusca(busca)
-  }, [busca])
 
   // Carrega plataformas e gêneros
   useEffect(() => {
@@ -150,8 +145,12 @@ function Catalogo() {
 
   function pesquisar(evento) {
     evento.preventDefault()
+
+    const dadosFormulario = new FormData(evento.currentTarget)
+    const textoBusca = String(dadosFormulario.get('busca') ?? '')
+
     alterarFiltro('busca', textoBusca.trim())
-  }
+}
 
   function mudarPagina(novaPagina) {
     const parametros = new URLSearchParams(searchParams)
@@ -178,16 +177,17 @@ function Catalogo() {
             Buscar jogo
           </label>
 
-          <input
-            id="busca"
-            type="search"
-            className="form-control"
-            placeholder="Digite o nome do jogo"
-            value={textoBusca}
-            onChange={(evento) =>
-              setTextoBusca(evento.target.value)
-            }
-          />
+          
+        <input
+          id="busca"
+          name="busca"
+          type="search"
+          className="form-control"
+          placeholder="Digite o nome do jogo"
+          key={busca}
+          defaultValue={busca}
+        />
+
         </div>
 
         <div className="col-md-3">
