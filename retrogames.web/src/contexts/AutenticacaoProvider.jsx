@@ -83,6 +83,9 @@ function AutenticacaoProvider({ children }) {
   const ehAdministrador =
     usuario?.perfil === 'Administrador'
 
+  const ehCliente =
+    usuario?.perfil === 'Cliente'
+
   return (
     <AutenticacaoContext.Provider
       value={{
@@ -90,6 +93,7 @@ function AutenticacaoProvider({ children }) {
         carregando,
         estaAutenticado,
         ehAdministrador,
+        ehCliente,
         entrar,
         cadastrar,
         sair
