@@ -64,13 +64,18 @@ function CarrinhoProvider({ children }) {
     )
   }
 
+  function limparCarrinho() {
+    setItens([])
+  }
+
   return (
     <CarrinhoContext.Provider
       value={{
         itens,
         adicionarJogo,
         alterarQuantidade,
-        removerJogo
+        removerJogo,
+        limparCarrinho
       }}
     >
       {children}
