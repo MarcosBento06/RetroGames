@@ -389,4 +389,84 @@ public class PedidoServiceTests
             Times.Never);
     }
 
+    [Fact]
+    public async Task FinalizarCompra_UsaPrecoDoBancoEIgnoraPrecoEnviado()
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        usuarioAtual
+            .Setup(u => u.IdUsuario)
+            .Returns(10);
+
+        jogoRepository
+            .Setup(r => r.BuscarPorIdAsync(1))
+            .ReturnsAsync(new Jogo
+            {
+                Id = 1,
+                Nome = "Jogo de teste",
+                Preco = 150m,
+                Estoque = 5,
+                Ativo = true
+            });
+
+        pedidoRepository
+            .Setup(r => r.InserirAsync(It.IsAny<Pedido>()))
+            .ReturnsAsync(50);
+
+        itemPedidoRepository
+            .Setup(r => r.InserirAsync(It.IsAny<ItemPedido>()))
+            .ReturnsAsync(1);
+
+        jogoRepository
+            .Setup(r => r.BaixarEstoqueAsync(1, 2))
+            .ReturnsAsync(1);
+
+        var itens = new List<ItemPedido>
+        {
+            new()
+            {
+                IdJogo = 1,
+                Quantidade = 2,
+                ValorUnitario = 1m
+            }
+        };
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        // Act
+        await servico.FinalizarCompraAsync(itens);
+
+        // Assert
+        Assert.Equal(150m, itens[0].ValorUnitario);
+
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.Is<Pedido>(p =>
+                p.ValorTotal == 300m)),
+            Times.Once);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.Is<ItemPedido>(i =>
+                i.ValorUnitario == 150m)),
+            Times.Once);
+    }
+
 }
