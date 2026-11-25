@@ -179,4 +179,9 @@ public class PedidoService : IPedidoService
         }
     }
 
+    public async Task<List<Pedido>> ListarPorUsuarioAsync(int idUsuario)
+    {
+        return await _repositorios.Pedido.ListarPorUsuarioAsync(idUsuario);
+    }
+
 }
