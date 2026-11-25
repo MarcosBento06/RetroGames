@@ -3,6 +3,7 @@ using RetroGames.Model.Model;
 using RetroGames.Repository.Interfaces;
 using RetroGames.Services;
 using RetroGames.Services.Interfaces;
+using System.Transactions;
 
 namespace RetroGames.WebApi.UnitTests.Services;
 
@@ -563,6 +564,109 @@ public class PedidoServiceTests
             r => r.InserirAsync(It.Is<ItemPedido>(i =>
                 i.IdJogo == 2 &&
                 i.ValorUnitario == 50m)),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task FinalizarCompra_QuandoBaixaEstoqueFalha_AbortaTransacao()
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        usuarioAtual
+            .Setup(u => u.IdUsuario)
+            .Returns(10);
+
+        jogoRepository
+            .Setup(r => r.BuscarPorIdAsync(1))
+            .ReturnsAsync(new Jogo
+            {
+                Id = 1,
+                Nome = "Jogo de teste",
+                Preco = 100m,
+                Estoque = 5,
+                Ativo = true
+            });
+
+        pedidoRepository
+            .Setup(r => r.InserirAsync(It.IsAny<Pedido>()))
+            .ReturnsAsync(50);
+
+        itemPedidoRepository
+            .Setup(r => r.InserirAsync(It.IsAny<ItemPedido>()))
+            .ReturnsAsync(1);
+
+        Transaction? transacao = null;
+
+        jogoRepository
+            .Setup(r => r.BaixarEstoqueAsync(1, 2))
+            .Returns(() =>
+            {
+                transacao = Transaction.Current?.Clone();
+                return Task.FromResult(0);
+            });
+
+        var itens = new List<ItemPedido>
+        {
+            new()
+            {
+                IdJogo = 1,
+                Quantidade = 2
+            }
+        };
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        // Act
+        var excecao = await Assert.ThrowsAsync<BusinessRuleException>(
+            () => servico.FinalizarCompraAsync(itens));
+
+        // Assert
+        Assert.Equal(
+            BusinessErrors.ESTOQUE_INSUFICIENTE.Code,
+            excecao.Erro.Code);
+
+        Assert.NotNull(transacao);
+
+        try
+        {
+            Assert.Equal(
+                TransactionStatus.Aborted,
+                transacao.TransactionInformation.Status);
+        }
+        finally
+        {
+            transacao.Dispose();
+        }
+
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<Pedido>()),
+            Times.Once);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<ItemPedido>()),
+            Times.Once);
+
+        jogoRepository.Verify(
+            r => r.BaixarEstoqueAsync(1, 2),
             Times.Once);
     }
 
