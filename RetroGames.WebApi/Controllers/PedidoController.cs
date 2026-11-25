@@ -3,6 +3,7 @@ using RetroGames.Model.Model;
 using RetroGames.Services.Interfaces;
 using RetroGames.WebApi.ApiModels;
 using Microsoft.AspNetCore.Authorization;
+using RetroGames.Services.ServiceModels;
 
 namespace RetroGames.WebApi.Controllers;
 
@@ -42,5 +43,19 @@ public class PedidoController : ControllerBase
         return StatusCode(
             StatusCodes.Status201Created,
             resposta);
+    }
+
+    [HttpGet("meus")]
+    public async Task<IActionResult> ListarMeus()
+    {
+        var pedidos = await _servico.ListarMeusPedidosAsync();
+
+        var resposta = new RetroGamesResponseApiModel<List<PedidoMeusPedidosServiceModel>>
+        {
+            ResponseCode = ResponseCodes.SUCESSO,
+            Data = pedidos
+        };
+
+        return Ok(resposta);
     }
 }
