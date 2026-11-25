@@ -54,4 +54,11 @@ public static class BusinessErrors
     ) JOGO_INDISPONIVEL =
         (110, "Um ou mais jogos não estão disponíveis para venda.",
             HttpStatusCode.BadRequest);
+
+    public static readonly (
+    int Code,
+    string DefaultMessage,
+    HttpStatusCode Status
+    ) ESTOQUE_INSUFICIENTE =
+        (111, "Estoque insuficiente.", HttpStatusCode.Conflict);
 }

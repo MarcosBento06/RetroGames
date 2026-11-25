@@ -20,15 +20,19 @@ public class PedidoService : IPedidoService
     public async Task<int> FinalizarCompraAsync(
     IReadOnlyCollection<ItemPedido> itens)
     {
-        await ValidarJogosDisponiveisAsync(itens);
+        var jogos = await ObterJogosDisponiveisAsync(itens);
+
+        ValidarEstoque(itens, jogos);
 
         throw new NotImplementedException(
             "A finalização será implementada nas próximas tarefas da C04.");
     }
 
-    private async Task ValidarJogosDisponiveisAsync(
+    private async Task<List<Jogo>> ObterJogosDisponiveisAsync(
     IReadOnlyCollection<ItemPedido> itens)
     {
+        var jogos = new List<Jogo>();
+
         var idsJogos = itens
             .Select(item => item.IdJogo)
             .Distinct();
@@ -42,6 +46,36 @@ public class PedidoService : IPedidoService
             {
                 throw new BusinessRuleException(
                     BusinessErrors.JOGO_INDISPONIVEL);
+            }
+
+            jogos.Add(jogo);
+        }
+
+        return jogos;
+    }
+
+    private void ValidarEstoque(
+    IReadOnlyCollection<ItemPedido> itens,
+    IReadOnlyCollection<Jogo> jogos)
+    {
+        var jogosPorId = jogos.ToDictionary(jogo => jogo.Id);
+
+        var quantidadesPorJogo = itens
+            .GroupBy(item => item.IdJogo)
+            .Select(grupo => new
+            {
+                IdJogo = grupo.Key,
+                QuantidadeSolicitada = grupo.Sum(item => item.Quantidade)
+            });
+
+        foreach (var item in quantidadesPorJogo)
+        {
+            var jogo = jogosPorId[item.IdJogo];
+
+            if (jogo.Estoque < item.QuantidadeSolicitada)
+            {
+                throw new BusinessRuleException(
+                    BusinessErrors.ESTOQUE_INSUFICIENTE);
             }
         }
     }
