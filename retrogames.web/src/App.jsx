@@ -13,6 +13,7 @@ import Jogos from './pages/Administracao/Jogos'
 import FormularioJogo from './pages/Administracao/FormularioJogo'
 import Cadastro from './pages/Cadastro/Cadastro'
 import Carrinho from './pages/Carrinho/Carrinho'
+import MeusPedidos from './pages/Pedidos/MeusPedidos'
 
 
 
@@ -56,10 +57,10 @@ function App() {
           />
         </Route>
 
-
         {/* Rotas do cliente autenticado */}
         <Route element={<RotaProtegida />}>
           <Route path="/carrinho" element={<Carrinho />} />
+          <Route path="/meus-pedidos" element={<MeusPedidos />} />
         </Route>
 
 

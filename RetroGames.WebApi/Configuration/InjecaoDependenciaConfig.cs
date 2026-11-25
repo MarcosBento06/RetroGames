@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using RetroGames.Model.Model;
@@ -28,6 +27,9 @@ public static class InjecaoDependenciaConfig
         services.AddScoped<ICondicaoJogoRepository, CondicaoJogoRepository>();
         services.AddScoped<IUsuarioRepository, UsuarioRepository>();
         services.AddScoped<IRepositorySet, RepositorySet>();
+        services.AddScoped<ISituacaoPedidoRepository, SituacaoPedidoRepository>();
+        services.AddScoped<IPedidoRepository, PedidoRepository>();
+        services.AddScoped<IItemPedidoRepository, ItemPedidoRepository>();
 
         return services;
     }
@@ -44,7 +46,9 @@ public static class InjecaoDependenciaConfig
         services.AddScoped<IAutenticacaoService, AutenticacaoService>();
 
         services.AddHttpContextAccessor();
-        services.AddScoped<IUsuarioAtualService, UsuarioAtualService>();    
+        services.AddScoped<IUsuarioAtualService, UsuarioAtualService>();  
+
+        services.AddScoped<IPedidoService, PedidoService>();  
 
         return services;
     }
