@@ -11,6 +11,7 @@ function Layout() {
     carregando,
     estaAutenticado,
     ehAdministrador,
+    ehCliente,
     sair
   } = useAutenticacao()
 
@@ -67,6 +68,22 @@ function Layout() {
 
             {!carregando && estaAutenticado && (
               <>
+                {ehCliente && (
+                <>
+                    <li className="nav-item">
+                    <Link className="nav-link" to="/carrinho">
+                        Carrinho
+                    </Link>
+                    </li>
+
+                    <li className="nav-item">
+                    <Link className="nav-link" to="/meus-pedidos">
+                        Meus pedidos
+                    </Link>
+                    </li>
+                </>
+                )}
+
                 {ehAdministrador && (
                   <li className="nav-item dropdown">
                     <button
