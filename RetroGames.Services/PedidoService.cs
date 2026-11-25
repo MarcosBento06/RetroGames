@@ -1,6 +1,7 @@
 using RetroGames.Model.Model;
 using RetroGames.Repository.Interfaces;
 using RetroGames.Services.Interfaces;
+using System.Transactions;
 
 namespace RetroGames.Services;
 
@@ -30,29 +31,45 @@ public class PedidoService : IPedidoService
 
         var pedido = CriarPedido(valorTotal);
 
-        pedido.Id = await _repositorios.Pedido.InserirAsync(pedido);
-
-        foreach (var item in itens)
+        var transactionOptions = new TransactionOptions
         {
-            item.IdPedido = pedido.Id;
+            IsolationLevel = IsolationLevel.ReadCommitted,
+            Timeout = TransactionManager.DefaultTimeout
+        };
 
-            await _repositorios.ItemPedido.InserirAsync(item);
-        }
-
-        foreach (var grupo in itens.GroupBy(item => item.IdJogo))
+        using (var transactionScope = new TransactionScope(
+            TransactionScopeOption.Required,
+            transactionOptions,
+            TransactionScopeAsyncFlowOption.Enabled))
         {
-            var quantidade = grupo.Sum(item => item.Quantidade);
+            pedido.Id = await _repositorios.Pedido
+                .InserirAsync(pedido);
 
-            var linhasAfetadas =
-                await _repositorios.Jogo.BaixarEstoqueAsync(
-                    grupo.Key,
-                    quantidade);
-
-            if (linhasAfetadas == 0)
+            foreach (var item in itens)
             {
-                throw new BusinessRuleException(
-                    BusinessErrors.ESTOQUE_INSUFICIENTE);
+                item.IdPedido = pedido.Id;
+
+                await _repositorios.ItemPedido
+                    .InserirAsync(item);
             }
+
+            foreach (var grupo in itens.GroupBy(item => item.IdJogo))
+            {
+                var quantidade = grupo.Sum(item => item.Quantidade);
+
+                var linhasAfetadas =
+                    await _repositorios.Jogo.BaixarEstoqueAsync(
+                        grupo.Key,
+                        quantidade);
+
+                if (linhasAfetadas == 0)
+                {
+                    throw new BusinessRuleException(
+                        BusinessErrors.ESTOQUE_INSUFICIENTE);
+                }
+            }
+
+            transactionScope.Complete();
         }
 
         return pedido.Id;
