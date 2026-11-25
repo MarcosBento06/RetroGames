@@ -469,4 +469,101 @@ public class PedidoServiceTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task FinalizarCompra_ComVariosItens_CalculaValorTotalCorretamente()
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        usuarioAtual
+            .Setup(u => u.IdUsuario)
+            .Returns(10);
+
+        jogoRepository
+            .Setup(r => r.BuscarPorIdAsync(1))
+            .ReturnsAsync(new Jogo
+            {
+                Id = 1,
+                Nome = "Jogo A",
+                Preco = 100m,
+                Estoque = 5,
+                Ativo = true
+            });
+
+        jogoRepository
+            .Setup(r => r.BuscarPorIdAsync(2))
+            .ReturnsAsync(new Jogo
+            {
+                Id = 2,
+                Nome = "Jogo B",
+                Preco = 50m,
+                Estoque = 5,
+                Ativo = true
+            });
+
+        pedidoRepository
+            .Setup(r => r.InserirAsync(It.IsAny<Pedido>()))
+            .ReturnsAsync(50);
+
+        itemPedidoRepository
+            .Setup(r => r.InserirAsync(It.IsAny<ItemPedido>()))
+            .ReturnsAsync(1);
+
+        jogoRepository
+            .Setup(r => r.BaixarEstoqueAsync(1, 2))
+            .ReturnsAsync(1);
+
+        jogoRepository
+            .Setup(r => r.BaixarEstoqueAsync(2, 3))
+            .ReturnsAsync(1);
+
+        var itens = new List<ItemPedido>
+        {
+            new() { IdJogo = 1, Quantidade = 2 },
+            new() { IdJogo = 2, Quantidade = 3 }
+        };
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        // Act
+        await servico.FinalizarCompraAsync(itens);
+
+        // Assert
+        // (2 x R$ 100,00) + (3 x R$ 50,00) = R$ 350,00
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.Is<Pedido>(p =>
+                p.ValorTotal == 350m)),
+            Times.Once);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.Is<ItemPedido>(i =>
+                i.IdJogo == 1 &&
+                i.ValorUnitario == 100m)),
+            Times.Once);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.Is<ItemPedido>(i =>
+                i.IdJogo == 2 &&
+                i.ValorUnitario == 50m)),
+            Times.Once);
+    }
+
 }
