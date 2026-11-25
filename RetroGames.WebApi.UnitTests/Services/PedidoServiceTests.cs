@@ -98,4 +98,55 @@ public class PedidoServiceTests
             r => r.BaixarEstoqueAsync(1, 2),
             Times.Once);
     }
+
+    [Fact]
+    public async Task FinalizarCompra_SemItens_LancaExcecaoENaoGravaPedido()
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        var itens = new List<ItemPedido>();
+
+        // Act
+        var excecao = await Assert.ThrowsAsync<ArgumentException>(
+            () => servico.FinalizarCompraAsync(itens));
+
+        // Assert
+        Assert.Contains("item", excecao.Message.ToLowerInvariant());
+
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<Pedido>()),
+            Times.Never);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<ItemPedido>()),
+            Times.Never);
+
+        jogoRepository.Verify(
+            r => r.BaixarEstoqueAsync(
+                It.IsAny<int>(),
+                It.IsAny<int>()),
+            Times.Never);
+    }
+
 }

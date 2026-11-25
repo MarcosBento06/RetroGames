@@ -21,6 +21,13 @@ public class PedidoService : IPedidoService
     public async Task<int> FinalizarCompraAsync(
     IReadOnlyCollection<ItemPedido> itens)
     {
+        if (itens is null || itens.Count == 0)
+        {
+            throw new ArgumentException(
+                "O pedido deve possuir pelo menos um item.",
+                nameof(itens));
+        }
+        
         var jogos = await ObterJogosDisponiveisAsync(itens);
 
         ValidarEstoque(itens, jogos);
