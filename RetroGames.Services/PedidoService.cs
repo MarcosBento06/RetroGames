@@ -23,6 +23,7 @@ public class PedidoService : IPedidoService
         var jogos = await ObterJogosDisponiveisAsync(itens);
 
         ValidarEstoque(itens, jogos);
+        PreencherPrecosDosItens(itens, jogos);
 
         throw new NotImplementedException(
             "A finalização será implementada nas próximas tarefas da C04.");
@@ -77,6 +78,18 @@ public class PedidoService : IPedidoService
                 throw new BusinessRuleException(
                     BusinessErrors.ESTOQUE_INSUFICIENTE);
             }
+        }
+    }
+
+    private static void PreencherPrecosDosItens(
+    IReadOnlyCollection<ItemPedido> itens,
+    IReadOnlyCollection<Jogo> jogos)
+    {
+        var jogosPorId = jogos.ToDictionary(jogo => jogo.Id);
+
+        foreach (var item in itens)
+        {
+            item.ValorUnitario = jogosPorId[item.IdJogo].Preco;
         }
     }
 }
