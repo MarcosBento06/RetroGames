@@ -866,4 +866,65 @@ public class PedidoServiceTests
             Times.Never);
     }
 
+    [Fact]
+    public async Task ListarMeusPedidos_RetornaPedidosDoMaisRecenteParaOMaisAntigo()
+    {
+        // Arrange
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var situacaoRepository = new Mock<ISituacaoPedidoRepository>();
+        var jogoRepository = new Mock<IJogoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet.Setup(r => r.Pedido).Returns(pedidoRepository.Object);
+        repositorySet.Setup(r => r.ItemPedido).Returns(itemPedidoRepository.Object);
+        repositorySet.Setup(r => r.SituacaoPedido).Returns(situacaoRepository.Object);
+        repositorySet.Setup(r => r.Jogo).Returns(jogoRepository.Object);
+
+        usuarioAtual.Setup(u => u.IdUsuario).Returns(10);
+
+        var dataAntiga = new DateTime(2026, 1, 10, 10, 0, 0, DateTimeKind.Utc);
+        var dataRecente = new DateTime(2026, 2, 10, 10, 0, 0, DateTimeKind.Utc);
+
+        pedidoRepository.Setup(r => r.ListarPorUsuarioAsync(10))
+            .ReturnsAsync(new List<Pedido>
+            {
+                new()
+                {
+                    Id = 50,
+                    DataPedido = dataAntiga,
+                    ValorTotal = 100m,
+                    IdUsuario = 10,
+                    IdSituacaoPedido = 1
+                },
+                new()
+                {
+                    Id = 60,
+                    DataPedido = dataRecente,
+                    ValorTotal = 200m,
+                    IdUsuario = 10,
+                    IdSituacaoPedido = 1
+                }
+            });
+
+        situacaoRepository.Setup(r => r.ListarAsync())
+            .ReturnsAsync(new List<SituacaoPedido>
+            {
+                new() { Id = 1, Descricao = "Pendente" }
+            });
+
+        itemPedidoRepository.Setup(r => r.ListarPorPedidoAsync(It.IsAny<int>()))
+            .ReturnsAsync(new List<ItemPedido>());
+
+        var servico = new PedidoService(repositorySet.Object, usuarioAtual.Object);
+
+        // Act
+        var resultado = await servico.ListarMeusPedidosAsync();
+
+        // Assert
+        Assert.Equal(2, resultado.Count);
+        Assert.Equal(60, resultado[0].Id);
+        Assert.Equal(50, resultado[1].Id);
+    }
 }

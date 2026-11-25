@@ -188,6 +188,10 @@ public class PedidoService : IPedidoService
 
         var pedidos = await _repositorios.Pedido
             .ListarPorUsuarioAsync(idUsuario);
+        pedidos = pedidos
+            .OrderByDescending(p => p.DataPedido)
+            .ThenByDescending(p => p.Id)
+            .ToList();
 
         if (pedidos.Count == 0)
         {
