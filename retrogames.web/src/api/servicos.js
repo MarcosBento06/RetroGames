@@ -77,6 +77,18 @@ export const condicaoJogoApi = {
 }
 
 export const autenticacaoApi = {
+
+  async cadastrar(nome, email, senha) {
+    const resposta = await api.post('/Autenticacao/cadastrar', {
+        nome,
+        email,
+        senha
+    })
+
+  return resposta.data.data
+  },
+
+  
   async entrar(email, senha) {
     const resposta = await api.post('/Autenticacao/login', {
       email,

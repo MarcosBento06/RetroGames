@@ -59,6 +59,19 @@ function AutenticacaoProvider({ children }) {
     return dados
   }
 
+    async function cadastrar(nome, email, senha) {
+        const dados = await autenticacaoApi.cadastrar(
+            nome,
+            email,
+            senha
+        )
+
+        setUsuario(dados)
+
+        return dados
+    }
+
+
   async function sair() {
     await autenticacaoApi.sair()
 
@@ -78,6 +91,7 @@ function AutenticacaoProvider({ children }) {
         estaAutenticado,
         ehAdministrador,
         entrar,
+        cadastrar,
         sair
       }}
     >

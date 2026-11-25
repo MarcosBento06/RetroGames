@@ -11,6 +11,8 @@ import Login from './pages/Login/Login'
 import Plataforma from './pages/Auxiliares/Plataforma'
 import Jogos from './pages/Administracao/Jogos'
 import FormularioJogo from './pages/Administracao/FormularioJogo'
+import Cadastro from './pages/Cadastro/Cadastro'
+
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
         />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/cadastro" element={<Cadastro />} />
+
 
         {/* Rotas administrativas */}
         <Route
