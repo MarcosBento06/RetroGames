@@ -25,6 +25,7 @@ public class PedidoService : IPedidoService
         ValidarEstoque(itens, jogos);
         PreencherPrecosDosItens(itens, jogos);
         var valorTotal = CalcularValorTotal(itens);
+        var pedido = CriarPedido(valorTotal);
 
         throw new NotImplementedException(
             "A finalização será implementada nas próximas tarefas da C04.");
@@ -99,5 +100,18 @@ public class PedidoService : IPedidoService
     {
         return itens.Sum(item =>
             item.Quantidade * item.ValorUnitario);
+    }
+
+    private Pedido CriarPedido(decimal valorTotal)
+    {
+        return new Pedido
+        {
+            DataPedido = DateTime.UtcNow,
+            ValorTotal = valorTotal,
+            IdUsuario = _usuarioAtual.IdUsuario
+                ?? throw new InvalidOperationException(
+                    "Não foi possível identificar o usuário autenticado."),
+            IdSituacaoPedido = 1
+        };
     }
 }
