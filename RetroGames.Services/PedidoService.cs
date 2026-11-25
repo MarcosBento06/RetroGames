@@ -39,6 +39,22 @@ public class PedidoService : IPedidoService
             await _repositorios.ItemPedido.InserirAsync(item);
         }
 
+        foreach (var grupo in itens.GroupBy(item => item.IdJogo))
+        {
+            var quantidade = grupo.Sum(item => item.Quantidade);
+
+            var linhasAfetadas =
+                await _repositorios.Jogo.BaixarEstoqueAsync(
+                    grupo.Key,
+                    quantidade);
+
+            if (linhasAfetadas == 0)
+            {
+                throw new BusinessRuleException(
+                    BusinessErrors.ESTOQUE_INSUFICIENTE);
+            }
+        }
+
         return pedido.Id;
     }
 

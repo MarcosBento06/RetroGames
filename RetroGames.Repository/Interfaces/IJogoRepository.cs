@@ -20,4 +20,6 @@ public interface IJogoRepository
     Task AlterarAsync(Jogo jogo);
 
     Task DesativarAsync(int id);
+
+    Task<int> BaixarEstoqueAsync(int idJogo, int quantidade);
 }

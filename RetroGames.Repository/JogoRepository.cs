@@ -322,5 +322,23 @@ public class JogoRepository : RepositoryBase, IJogoRepository
         await ExecutarGravacaoAsync(comando);
     }
 
+    public async Task<int> BaixarEstoqueAsync(
+    int idJogo,
+    int quantidade)
+    {
+        const string sql = """
+            UPDATE tb_jogo
+            SET qt_estoque = qt_estoque - @quantidade
+            WHERE co_seq_jogo = @idJogo
+            AND qt_estoque >= @quantidade;
+            """;
 
+        await using var conexao = await AbrirConexaoAsync();
+        await using var comando = CriarComando(conexao, sql);
+
+        AdicionarParametro(comando, "@quantidade", quantidade);
+        AdicionarParametro(comando, "@idJogo", idJogo);
+
+        return await comando.ExecuteNonQueryAsync();
+    }
 }
