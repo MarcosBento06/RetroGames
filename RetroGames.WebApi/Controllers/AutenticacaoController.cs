@@ -66,6 +66,45 @@ public class AutenticacaoController : ControllerBase
         });
     }
 
+
+    [HttpPost("cadastrar")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Cadastrar(
+        [FromBody] CadastrarClienteRequestApiModel requisicao)
+    {
+        var cliente = await _autenticacaoService.CadastrarClienteAsync(
+            requisicao.Nome,
+            requisicao.Email,
+            requisicao.Senha
+        );
+
+        var principal = cliente.CriarPrincipal();
+
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            principal
+        );
+
+        var resposta = new UsuarioLogadoResponseApiModel
+        {
+            Id = cliente.Id,
+            Nome = cliente.Nome,
+            Email = cliente.Email,
+            Perfil = principal.FindFirst(ClaimTypes.Role)?.Value
+                ?? string.Empty
+        };
+
+        return StatusCode(
+            StatusCodes.Status201Created,
+            new RetroGamesResponseApiModel<UsuarioLogadoResponseApiModel>
+            {
+                ResponseCode = ResponseCodes.SUCESSO,
+                Data = resposta
+            }
+        );
+    }
+
+
     [HttpPost("logout")]
     [Authorize]
     public async Task<IActionResult> Logout()

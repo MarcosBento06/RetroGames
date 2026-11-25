@@ -5,6 +5,7 @@ import { Link, useParams } from 'react-router-dom'
 import { jogoApi } from '../../api/servicos'
 import { obterMensagemErro } from '../../api/erros'
 import { formatarPreco } from '../../lib/formato'
+import { useCarrinho } from '../../hooks/useCarrinho'
 
 import {
   Carregando,
@@ -15,10 +16,14 @@ import {
 function DetalheJogo() {
   const { id } = useParams()
 
+  const { itens, adicionarJogo } = useCarrinho()
   const [jogo, setJogo] = useState(null)
   const [carregando, setCarregando] = useState(true)
   const [erro, setErro] = useState('')
   const [tentativas, setTentativas] = useState(0)
+
+  const quantidadeNoCarrinho =
+  itens.find(item => item.idJogo === jogo?.id)?.quantidade ?? 0
 
   useEffect(() => {
     let ativo = true
@@ -110,6 +115,31 @@ function DetalheJogo() {
                 Esgotado
               </span>
             )}
+
+            <div className="mt-3">
+              <button
+                type="button"
+                className="btn btn-primary"
+                onClick={() => adicionarJogo(jogo.id)}
+                disabled={
+                  jogo.estoque <= 0 ||
+                  quantidadeNoCarrinho >= 10
+                }
+              >
+                {jogo.estoque <= 0
+                  ? 'Esgotado'
+                  : quantidadeNoCarrinho >= 10
+                    ? 'Limite de 10 unidades'
+                    : 'Adicionar ao carrinho'}
+              </button>
+
+              {quantidadeNoCarrinho > 0 && (
+                <p className="text-success mt-2 mb-0">
+                  No carrinho: {quantidadeNoCarrinho} unidade(s).
+                </p>
+              )}
+            </div>
+
           </div>
         </div>
       )}
