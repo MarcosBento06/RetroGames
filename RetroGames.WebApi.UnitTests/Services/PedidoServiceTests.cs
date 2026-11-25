@@ -4,6 +4,7 @@ using RetroGames.Repository.Interfaces;
 using RetroGames.Services;
 using RetroGames.Services.Interfaces;
 using System.Transactions;
+using RetroGames.Services.ServiceModels;
 
 namespace RetroGames.WebApi.UnitTests.Services;
 
@@ -667,6 +668,129 @@ public class PedidoServiceTests
 
         jogoRepository.Verify(
             r => r.BaixarEstoqueAsync(1, 2),
+            Times.Once);
+    }
+
+    [Fact]
+    public async Task ListarMeusPedidos_ComPedidosExistentes_RetornaPedidosComSituacaoEItens()
+    {
+        // Arrange
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var situacaoRepository = new Mock<ISituacaoPedidoRepository>();
+        var jogoRepository = new Mock<IJogoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.SituacaoPedido)
+            .Returns(situacaoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        usuarioAtual
+            .Setup(u => u.IdUsuario)
+            .Returns(10);
+
+        var dataPedido = DateTime.UtcNow;
+
+        pedidoRepository
+            .Setup(r => r.ListarPorUsuarioAsync(10))
+            .ReturnsAsync(new List<Pedido>
+            {
+                new()
+                {
+                    Id = 50,
+                    DataPedido = dataPedido,
+                    ValorTotal = 200m,
+                    IdUsuario = 10,
+                    IdSituacaoPedido = 1
+                }
+            });
+
+        situacaoRepository
+            .Setup(r => r.ListarAsync())
+            .ReturnsAsync(new List<SituacaoPedido>
+            {
+                new()
+                {
+                    Id = 1,
+                    Descricao = "Pendente"
+                }
+            });
+
+        itemPedidoRepository
+            .Setup(r => r.ListarPorPedidoAsync(50))
+            .ReturnsAsync(new List<ItemPedido>
+            {
+                new()
+                {
+                    Id = 1,
+                    IdPedido = 50,
+                    IdJogo = 5,
+                    Quantidade = 2,
+                    ValorUnitario = 100m
+                }
+            });
+
+        jogoRepository
+            .Setup(r => r.ListarAsync(
+                It.IsAny<string?>(),
+                It.IsAny<int?>(),
+                It.IsAny<IReadOnlyCollection<int>?>(),
+                It.IsAny<bool>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()))
+            .ReturnsAsync((
+                new List<Jogo>
+                {
+                    new()
+                    {
+                        Id = 5,
+                        Nome = "Super Mario Bros.",
+                        Ativo = true
+                    }
+                },
+                1
+            ));
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        // Act
+        var resultado = await servico.ListarMeusPedidosAsync();
+
+        // Assert
+        var pedido = Assert.Single(resultado);
+
+        Assert.Equal(50, pedido.Id);
+        Assert.Equal(dataPedido, pedido.DataPedido);
+        Assert.Equal(200m, pedido.ValorTotal);
+        Assert.Equal("Pendente", pedido.Situacao);
+
+        var item = Assert.Single(pedido.Itens);
+
+        Assert.Equal("Super Mario Bros.", item.NomeJogo);
+        Assert.Equal(2, item.Quantidade);
+        Assert.Equal(100m, item.ValorUnitario);
+
+        pedidoRepository.Verify(
+            r => r.ListarPorUsuarioAsync(10),
+            Times.Once);
+
+        itemPedidoRepository.Verify(
+            r => r.ListarPorPedidoAsync(50),
             Times.Once);
     }
 
