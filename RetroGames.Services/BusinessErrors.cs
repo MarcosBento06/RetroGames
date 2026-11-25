@@ -46,4 +46,12 @@ public static class BusinessErrors
         HttpStatusCode Status
     ) GENERO_NAO_ENCONTRADO =
         (105, "Gênero não encontrado.", HttpStatusCode.NotFound);
+
+    public static readonly (
+    int Code,
+    string DefaultMessage,
+    HttpStatusCode Status
+    ) JOGO_INDISPONIVEL =
+        (110, "Um ou mais jogos não estão disponíveis para venda.",
+            HttpStatusCode.BadRequest);
 }

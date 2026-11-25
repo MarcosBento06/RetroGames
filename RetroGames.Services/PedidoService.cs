@@ -17,10 +17,32 @@ public class PedidoService : IPedidoService
         _usuarioAtual = usuarioAtual;
     }
 
-    public Task<int> FinalizarCompraAsync(
-        IReadOnlyCollection<ItemPedido> itens)
+    public async Task<int> FinalizarCompraAsync(
+    IReadOnlyCollection<ItemPedido> itens)
     {
+        await ValidarJogosDisponiveisAsync(itens);
+
         throw new NotImplementedException(
             "A finalização será implementada nas próximas tarefas da C04.");
+    }
+
+    private async Task ValidarJogosDisponiveisAsync(
+    IReadOnlyCollection<ItemPedido> itens)
+    {
+        var idsJogos = itens
+            .Select(item => item.IdJogo)
+            .Distinct();
+
+        foreach (var idJogo in idsJogos)
+        {
+            var jogo = await _repositorios.Jogo
+                .BuscarPorIdAsync(idJogo);
+
+            if (jogo is null || !jogo.Ativo)
+            {
+                throw new BusinessRuleException(
+                    BusinessErrors.JOGO_INDISPONIVEL);
+            }
+        }
     }
 }
