@@ -4,6 +4,7 @@ using RetroGames.Model.Constantes;
 using RetroGames.Model.Model;
 using RetroGames.Repository.Interfaces;
 using RetroGames.Services.Interfaces;
+using RetroGames.Repository;
 
 namespace RetroGames.Services;
 
@@ -74,4 +75,51 @@ public class AutenticacaoService : IAutenticacaoService
 
         await _repositorios.Usuario.InserirAsync(administrador);
     }
+
+    
+    public async Task<Usuario> CadastrarClienteAsync(
+        string nome,
+        string email,
+        string senha)
+    {
+        nome = nome.Trim();
+        email = email.Trim();
+
+        var usuarioExistente = await _repositorios.Usuario
+            .BuscarPorEmailAsync(email);
+
+        if (usuarioExistente is not null)
+        {
+            throw new BusinessRuleException(
+                BusinessErrors.EMAIL_JA_CADASTRADO);
+        }
+
+        var cliente = new Usuario
+        {
+            Nome = nome,
+            Email = email,
+            Ativo = true,
+            DataCadastro = DateTime.UtcNow,
+            IdPerfil = PerfilIds.Cliente
+        };
+
+        cliente.SenhaHash = _passwordHasher.HashPassword(
+            cliente,
+            senha
+        );
+
+        try
+        {
+            cliente.Id = await _repositorios.Usuario
+                .InserirAsync(cliente);
+        }
+        catch (RegistroDuplicadoException)
+        {
+            throw new BusinessRuleException(
+                BusinessErrors.EMAIL_JA_CADASTRADO);
+        }
+
+        return cliente;
+    }
+
 }
