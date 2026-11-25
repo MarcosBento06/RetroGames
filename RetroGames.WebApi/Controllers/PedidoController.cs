@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using RetroGames.Model.Model;
 using RetroGames.Services.Interfaces;
 using RetroGames.WebApi.ApiModels;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RetroGames.WebApi.Controllers;
 
@@ -16,6 +17,8 @@ public class PedidoController : ControllerBase
         _servico = servico;
     }
 
+    
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Inserir(
         [FromBody] InserirPedidoRequestApiModel request)
