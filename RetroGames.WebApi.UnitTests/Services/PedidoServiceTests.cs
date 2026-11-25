@@ -318,4 +318,75 @@ public class PedidoServiceTests
             r => r.BaixarEstoqueAsync(It.IsAny<int>(), It.IsAny<int>()),
             Times.Never);
     }
+
+    [Fact]
+    public async Task FinalizarCompra_ComEstoqueInsuficiente_LancaExcecaoENaoGrava()
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        jogoRepository
+            .Setup(r => r.BuscarPorIdAsync(1))
+            .ReturnsAsync(new Jogo
+            {
+                Id = 1,
+                Nome = "Jogo com pouco estoque",
+                Preco = 100m,
+                Estoque = 1,
+                Ativo = true
+            });
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        var itens = new List<ItemPedido>
+        {
+            new()
+            {
+                IdJogo = 1,
+                Quantidade = 2
+            }
+        };
+
+        // Act
+        var excecao = await Assert.ThrowsAsync<BusinessRuleException>(
+            () => servico.FinalizarCompraAsync(itens));
+
+        // Assert
+        Assert.Equal(
+            BusinessErrors.ESTOQUE_INSUFICIENTE.Code,
+            excecao.Erro.Code);
+
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<Pedido>()),
+            Times.Never);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<ItemPedido>()),
+            Times.Never);
+
+        jogoRepository.Verify(
+            r => r.BaixarEstoqueAsync(
+                It.IsAny<int>(),
+                It.IsAny<int>()),
+            Times.Never);
+    }
+
 }
