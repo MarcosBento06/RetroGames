@@ -116,14 +116,6 @@ export const pedidoApi = {
     const resposta = await api.post('/Pedido', dados)
 
     return resposta.data.data
-  }
-}
-
-export const pedidoApi = {
-  async finalizarCompra(dados) {
-    const resposta = await api.post('/Pedido', dados)
-
-    return resposta.data.data
   },
 
   async listarMeus() {
