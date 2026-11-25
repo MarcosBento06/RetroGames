@@ -53,7 +53,10 @@ public class PedidoRepository : RepositoryBase, IPedidoRepository
                 co_usuario,
                 co_situacao_pedido
             FROM tb_pedido
-            WHERE co_usuario = @idUsuario;
+            WHERE co_usuario = @idUsuario
+            ORDER BY
+                dt_pedido DESC,
+                co_seq_pedido DESC;
             """;
 
         var pedidos = new List<Pedido>();
