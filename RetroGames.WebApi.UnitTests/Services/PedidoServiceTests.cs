@@ -149,4 +149,53 @@ public class PedidoServiceTests
             Times.Never);
     }
 
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(11)]
+    public async Task FinalizarCompra_ComQuantidadeInvalida_LancaExcecao(
+        int quantidade)
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        var itens = new List<ItemPedido>
+        {
+            new()
+            {
+                IdJogo = 1,
+                Quantidade = quantidade
+            }
+        };
+
+        // Act
+        var excecao = await Assert.ThrowsAsync<ArgumentException>(
+            () => servico.FinalizarCompraAsync(itens));
+
+        // Assert
+        Assert.Contains("entre 1 e 10", excecao.Message);
+
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<Pedido>()),
+            Times.Never);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<ItemPedido>()),
+            Times.Never);
+
+        jogoRepository.Verify(
+            r => r.BaixarEstoqueAsync(
+                It.IsAny<int>(),
+                It.IsAny<int>()),
+            Times.Never);
+    }
+
 }

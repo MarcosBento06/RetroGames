@@ -27,7 +27,9 @@ public class PedidoService : IPedidoService
                 "O pedido deve possuir pelo menos um item.",
                 nameof(itens));
         }
-        
+
+        ValidarQuantidades(itens);
+
         var jogos = await ObterJogosDisponiveisAsync(itens);
 
         ValidarEstoque(itens, jogos);
@@ -165,4 +167,16 @@ public class PedidoService : IPedidoService
             IdSituacaoPedido = 1
         };
     }
+
+    private static void ValidarQuantidades(
+        IReadOnlyCollection<ItemPedido> itens)
+    {
+        if (itens.Any(item => item.Quantidade < 1 || item.Quantidade > 10))
+        {
+            throw new ArgumentException(
+                "A quantidade de cada item deve estar entre 1 e 10.",
+                nameof(itens));
+        }
+    }
+
 }
