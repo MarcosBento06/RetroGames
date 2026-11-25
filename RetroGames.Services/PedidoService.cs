@@ -24,6 +24,7 @@ public class PedidoService : IPedidoService
 
         ValidarEstoque(itens, jogos);
         PreencherPrecosDosItens(itens, jogos);
+        var valorTotal = CalcularValorTotal(itens);
 
         throw new NotImplementedException(
             "A finalização será implementada nas próximas tarefas da C04.");
@@ -91,5 +92,12 @@ public class PedidoService : IPedidoService
         {
             item.ValorUnitario = jogosPorId[item.IdJogo].Preco;
         }
+    }
+
+    private static decimal CalcularValorTotal(
+    IReadOnlyCollection<ItemPedido> itens)
+    {
+        return itens.Sum(item =>
+            item.Quantidade * item.ValorUnitario);
     }
 }
