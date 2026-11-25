@@ -927,4 +927,56 @@ public class PedidoServiceTests
         Assert.Equal(60, resultado[0].Id);
         Assert.Equal(50, resultado[1].Id);
     }
+
+    [Fact]
+    public async Task ListarMeusPedidos_SemPedidos_RetornaListaVazia()
+    {
+        // Arrange
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var situacaoRepository = new Mock<ISituacaoPedidoRepository>();
+        var jogoRepository = new Mock<IJogoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet.Setup(r => r.Pedido).Returns(pedidoRepository.Object);
+        repositorySet.Setup(r => r.ItemPedido).Returns(itemPedidoRepository.Object);
+        repositorySet.Setup(r => r.SituacaoPedido).Returns(situacaoRepository.Object);
+        repositorySet.Setup(r => r.Jogo).Returns(jogoRepository.Object);
+
+        usuarioAtual.Setup(u => u.IdUsuario).Returns(10);
+
+        pedidoRepository.Setup(r => r.ListarPorUsuarioAsync(10))
+            .ReturnsAsync(new List<Pedido>());
+
+        var servico = new PedidoService(repositorySet.Object, usuarioAtual.Object);
+
+        // Act
+        var resultado = await servico.ListarMeusPedidosAsync();
+
+        // Assert
+        Assert.Empty(resultado);
+
+        pedidoRepository.Verify(
+            r => r.ListarPorUsuarioAsync(10),
+            Times.Once);
+
+        situacaoRepository.Verify(
+            r => r.ListarAsync(),
+            Times.Never);
+
+        itemPedidoRepository.Verify(
+            r => r.ListarPorPedidoAsync(It.IsAny<int>()),
+            Times.Never);
+
+        jogoRepository.Verify(
+            r => r.ListarAsync(
+                It.IsAny<string?>(),
+                It.IsAny<int?>(),
+                It.IsAny<IReadOnlyCollection<int>?>(),
+                It.IsAny<bool>(),
+                It.IsAny<int>(),
+                It.IsAny<int>()),
+            Times.Never);
+    }
 }
