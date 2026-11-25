@@ -179,9 +179,14 @@ public class PedidoService : IPedidoService
         }
     }
 
-    public async Task<List<Pedido>> ListarPorUsuarioAsync(int idUsuario)
+    public async Task<List<Pedido>> ListarMeusPedidosAsync()
     {
-        return await _repositorios.Pedido.ListarPorUsuarioAsync(idUsuario);
+        var idUsuario = _usuarioAtual.IdUsuario
+            ?? throw new InvalidOperationException(
+                "Não foi possível identificar o usuário autenticado.");
+
+        return await _repositorios.Pedido
+            .ListarPorUsuarioAsync(idUsuario);
     }
 
 }
