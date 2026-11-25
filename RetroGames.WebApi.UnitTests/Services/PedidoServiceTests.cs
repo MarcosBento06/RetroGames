@@ -198,4 +198,124 @@ public class PedidoServiceTests
             Times.Never);
     }
 
+    [Fact]
+    public async Task FinalizarCompra_ComJogoInexistente_LancaJogoIndisponivelENaoGrava()
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        jogoRepository
+            .Setup(r => r.BuscarPorIdAsync(999))
+            .ReturnsAsync((Jogo?)null);
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        var itens = new List<ItemPedido>
+        {
+            new() { IdJogo = 999, Quantidade = 1 }
+        };
+
+        // Act
+        var excecao = await Assert.ThrowsAsync<BusinessRuleException>(
+            () => servico.FinalizarCompraAsync(itens));
+
+        // Assert
+        Assert.Equal(
+            BusinessErrors.JOGO_INDISPONIVEL.Code,
+            excecao.Erro.Code);
+
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<Pedido>()),
+            Times.Never);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<ItemPedido>()),
+            Times.Never);
+
+        jogoRepository.Verify(
+            r => r.BaixarEstoqueAsync(It.IsAny<int>(), It.IsAny<int>()),
+            Times.Never);
+    }
+
+    [Fact]
+    public async Task FinalizarCompra_ComJogoInativo_LancaJogoIndisponivelENaoGrava()
+    {
+        // Arrange
+        var jogoRepository = new Mock<IJogoRepository>();
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet
+            .Setup(r => r.Jogo)
+            .Returns(jogoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.Pedido)
+            .Returns(pedidoRepository.Object);
+
+        repositorySet
+            .Setup(r => r.ItemPedido)
+            .Returns(itemPedidoRepository.Object);
+
+        jogoRepository
+            .Setup(r => r.BuscarPorIdAsync(1))
+            .ReturnsAsync(new Jogo
+            {
+                Id = 1,
+                Nome = "Jogo inativo",
+                Preco = 100m,
+                Estoque = 5,
+                Ativo = false
+            });
+
+        var servico = new PedidoService(
+            repositorySet.Object,
+            usuarioAtual.Object);
+
+        var itens = new List<ItemPedido>
+        {
+            new() { IdJogo = 1, Quantidade = 1 }
+        };
+
+        // Act
+        var excecao = await Assert.ThrowsAsync<BusinessRuleException>(
+            () => servico.FinalizarCompraAsync(itens));
+
+        // Assert
+        Assert.Equal(
+            BusinessErrors.JOGO_INDISPONIVEL.Code,
+            excecao.Erro.Code);
+
+        pedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<Pedido>()),
+            Times.Never);
+
+        itemPedidoRepository.Verify(
+            r => r.InserirAsync(It.IsAny<ItemPedido>()),
+            Times.Never);
+
+        jogoRepository.Verify(
+            r => r.BaixarEstoqueAsync(It.IsAny<int>(), It.IsAny<int>()),
+            Times.Never);
+    }
 }
