@@ -23,12 +23,23 @@ public class PedidoService : IPedidoService
         var jogos = await ObterJogosDisponiveisAsync(itens);
 
         ValidarEstoque(itens, jogos);
+
         PreencherPrecosDosItens(itens, jogos);
+
         var valorTotal = CalcularValorTotal(itens);
+
         var pedido = CriarPedido(valorTotal);
 
-        throw new NotImplementedException(
-            "A finalização será implementada nas próximas tarefas da C04.");
+        pedido.Id = await _repositorios.Pedido.InserirAsync(pedido);
+
+        foreach (var item in itens)
+        {
+            item.IdPedido = pedido.Id;
+
+            await _repositorios.ItemPedido.InserirAsync(item);
+        }
+
+        return pedido.Id;
     }
 
     private async Task<List<Jogo>> ObterJogosDisponiveisAsync(
