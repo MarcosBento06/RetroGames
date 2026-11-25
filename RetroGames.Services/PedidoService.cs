@@ -2,6 +2,7 @@ using RetroGames.Model.Model;
 using RetroGames.Repository.Interfaces;
 using RetroGames.Services.Interfaces;
 using System.Transactions;
+using RetroGames.Services.ServiceModels;
 
 namespace RetroGames.Services;
 
@@ -179,14 +180,71 @@ public class PedidoService : IPedidoService
         }
     }
 
-    public async Task<List<Pedido>> ListarMeusPedidosAsync()
+    public async Task<List<PedidoMeusPedidosServiceModel>> ListarMeusPedidosAsync()
     {
         var idUsuario = _usuarioAtual.IdUsuario
             ?? throw new InvalidOperationException(
                 "Não foi possível identificar o usuário autenticado.");
 
-        return await _repositorios.Pedido
+        var pedidos = await _repositorios.Pedido
             .ListarPorUsuarioAsync(idUsuario);
+
+        if (pedidos.Count == 0)
+        {
+            return new List<PedidoMeusPedidosServiceModel>();
+        }
+
+        var situacoes = await _repositorios.SituacaoPedido.ListarAsync();
+
+        var itensPorPedido = new Dictionary<int, List<ItemPedido>>();
+
+        foreach (var pedido in pedidos)
+        {
+            itensPorPedido[pedido.Id] = await _repositorios.ItemPedido
+                .ListarPorPedidoAsync(pedido.Id);
+        }
+
+        var idsJogos = itensPorPedido.Values
+            .SelectMany(itens => itens)
+            .Select(item => item.IdJogo)
+            .Distinct()
+            .ToArray();
+
+        var jogos = new List<Jogo>();
+
+        if (idsJogos.Length > 0)
+        {
+            var resultadoJogos = await _repositorios.Jogo.ListarAsync(
+                idsJogos: idsJogos,
+                incluirInativos: true,
+                pagina: 1,
+                tamanhoPagina: idsJogos.Length);
+
+            jogos = resultadoJogos.Jogos;
+        }
+
+        return pedidos.Select(pedido => new PedidoMeusPedidosServiceModel
+        {
+            Id = pedido.Id,
+            DataPedido = pedido.DataPedido,
+            ValorTotal = pedido.ValorTotal,
+
+            Situacao = situacoes
+                .FirstOrDefault(s => s.Id == pedido.IdSituacaoPedido)
+                ?.Descricao ?? "Situação não encontrada",
+
+            Itens = itensPorPedido[pedido.Id]
+                .Select(item => new ItemPedidoMeusPedidosServiceModel
+                {
+                    NomeJogo = jogos
+                        .FirstOrDefault(j => j.Id == item.IdJogo)
+                        ?.Nome ?? "Jogo não encontrado",
+
+                    Quantidade = item.Quantidade,
+                    ValorUnitario = item.ValorUnitario
+                })
+                .ToList()
+        }).ToList();
     }
 
 }
