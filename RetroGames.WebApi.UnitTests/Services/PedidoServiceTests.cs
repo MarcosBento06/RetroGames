@@ -794,4 +794,76 @@ public class PedidoServiceTests
             Times.Once);
     }
 
+    [Fact]
+    public async Task ListarMeusPedidos_RetornaSomentePedidosDoUsuarioAutenticado()
+    {
+        // Arrange
+        var pedidoRepository = new Mock<IPedidoRepository>();
+        var itemPedidoRepository = new Mock<IItemPedidoRepository>();
+        var situacaoRepository = new Mock<ISituacaoPedidoRepository>();
+        var jogoRepository = new Mock<IJogoRepository>();
+        var repositorySet = new Mock<IRepositorySet>();
+        var usuarioAtual = new Mock<IUsuarioAtualService>();
+
+        repositorySet.Setup(r => r.Pedido).Returns(pedidoRepository.Object);
+        repositorySet.Setup(r => r.ItemPedido).Returns(itemPedidoRepository.Object);
+        repositorySet.Setup(r => r.SituacaoPedido).Returns(situacaoRepository.Object);
+        repositorySet.Setup(r => r.Jogo).Returns(jogoRepository.Object);
+
+        usuarioAtual.Setup(u => u.IdUsuario).Returns(10);
+
+        pedidoRepository.Setup(r => r.ListarPorUsuarioAsync(10))
+            .ReturnsAsync(new List<Pedido>
+            {
+                new()
+                {
+                    Id = 50,
+                    DataPedido = DateTime.UtcNow,
+                    ValorTotal = 200m,
+                    IdUsuario = 10,
+                    IdSituacaoPedido = 1
+                }
+            });
+
+        pedidoRepository.Setup(r => r.ListarPorUsuarioAsync(20))
+            .ReturnsAsync(new List<Pedido>
+            {
+                new()
+                {
+                    Id = 60,
+                    DataPedido = DateTime.UtcNow,
+                    ValorTotal = 300m,
+                    IdUsuario = 20,
+                    IdSituacaoPedido = 1
+                }
+            });
+
+        situacaoRepository.Setup(r => r.ListarAsync())
+            .ReturnsAsync(new List<SituacaoPedido>
+            {
+                new() { Id = 1, Descricao = "Pendente" }
+            });
+
+        itemPedidoRepository.Setup(r => r.ListarPorPedidoAsync(50))
+            .ReturnsAsync(new List<ItemPedido>());
+
+        var servico = new PedidoService(repositorySet.Object, usuarioAtual.Object);
+
+        // Act
+        var resultado = await servico.ListarMeusPedidosAsync();
+
+        // Assert
+        var pedido = Assert.Single(resultado);
+
+        Assert.Equal(50, pedido.Id);
+
+        pedidoRepository.Verify(
+            r => r.ListarPorUsuarioAsync(10),
+            Times.Once);
+
+        pedidoRepository.Verify(
+            r => r.ListarPorUsuarioAsync(20),
+            Times.Never);
+    }
+
 }
