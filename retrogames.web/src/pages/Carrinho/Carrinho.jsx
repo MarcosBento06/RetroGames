@@ -5,12 +5,23 @@ import { Link } from 'react-router-dom'
 import { useCarrinho } from '../../hooks/useCarrinho'
 import { jogoApi } from '../../api/servicos'
 import { formatarPreco } from '../../lib/formato'
+import { pedidoApi } from '../../api/pedidos'
+import { obterMensagemErro } from '../../api/erros'
 
 function Carrinho() {
-  const { itens, alterarQuantidade, removerJogo } = useCarrinho()
+  const {
+    itens,
+    alterarQuantidade,
+    removerJogo,
+    limparCarrinho
+  } = useCarrinho()
 
   const [jogosPorId, setJogosPorId] = useState({})
   const [carregando, setCarregando] = useState(false)
+
+  const [finalizando, setFinalizando] = useState(false)
+  const [erroCompra, setErroCompra] = useState('')
+  const [compraRealizada, setCompraRealizada] = useState(false)
 
   const idsJogos = itens.map(item => item.idJogo).join(',')
 
@@ -64,9 +75,52 @@ function Carrinho() {
     return soma + Number(jogo.preco) * item.quantidade
   }, 0)
 
+  // Envia os itens do carrinho para a API de pedidos
+  async function finalizarCompra() {
+    if (finalizando || carregando || itens.length === 0) {
+      return
+    }
+
+    if (itens.some(item => !jogosPorId[item.idJogo])) {
+      return
+    }
+
+    setFinalizando(true)
+    setErroCompra('')
+    setCompraRealizada(false)
+
+    try {
+      await pedidoApi.finalizar(itens)
+
+      // Limpa o carrinho somente após a compra ter sucesso
+      limparCarrinho()
+
+      setCompraRealizada(true)
+    } catch (erro) {
+      // Mantém os itens no carrinho se a compra falhar
+      setErroCompra(obterMensagemErro(erro))
+    } finally {
+      setFinalizando(false)
+    }
+  }
+
   return (
     <div>
       <h1 className="mb-4">Meu Carrinho</h1>
+
+      {/* Mensagem de erro ao finalizar */}
+      {erroCompra && (
+        <div className="alert alert-danger" role="alert">
+          {erroCompra}
+        </div>
+      )}
+
+      {/* Mensagem de compra realizada */}
+      {compraRealizada && (
+        <div className="alert alert-success" role="status">
+          Pedido realizado com sucesso!
+        </div>
+      )}
 
       {itens.length === 0 ? (
         <div>
@@ -114,6 +168,7 @@ function Carrinho() {
                           className="form-select"
                           style={{ maxWidth: '100px' }}
                           value={item.quantidade}
+                          disabled={finalizando}
                           aria-label={`Quantidade do jogo ${item.idJogo}`}
                           onChange={evento =>
                             alterarQuantidade(
@@ -149,6 +204,7 @@ function Carrinho() {
                           type="button"
                           className="btn btn-outline-danger btn-sm"
                           onClick={() => removerJogo(item.idJogo)}
+                          disabled={finalizando}
                         >
                           Remover
                         </button>
@@ -171,9 +227,29 @@ function Carrinho() {
             </p>
           </div>
 
-          <Link to="/" className="btn btn-outline-primary">
-            Continuar comprando
-          </Link>
+          <div className="d-flex flex-wrap gap-2">
+            <Link
+              to="/"
+              className="btn btn-outline-primary"
+            >
+              Continuar comprando
+            </Link>
+
+            <button
+              type="button"
+              className="btn btn-success"
+              onClick={finalizarCompra}
+              disabled={
+                finalizando ||
+                carregando ||
+                itens.some(item => !jogosPorId[item.idJogo])
+              }
+            >
+              {finalizando
+                ? 'Finalizando...'
+                : 'Finalizar compra'}
+            </button>
+          </div>
         </>
       )}
     </div>
