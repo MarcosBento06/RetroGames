@@ -44,7 +44,8 @@ public class PedidoController : ControllerBase
             StatusCodes.Status201Created,
             resposta);
     }
-
+     
+    [Authorize]
     [HttpGet("meus")]
     public async Task<IActionResult> ListarMeus()
     {
