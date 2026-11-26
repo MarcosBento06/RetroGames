@@ -1,0 +1,142 @@
+/* RetroGames | UI01 — Identidade visual e tema global
+   Importado após o Bootstrap 5.3 em src/main.jsx. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap');
+
+:root {
+  --rg-fundo: #0a0d0a;
+  --rg-superficie: #131713;
+  --rg-superficie-2: #1a201a;
+  --rg-borda: #2a312a;
+  --rg-borda-campo: #6d766b;
+  --rg-limao: #c8f31d;
+  --rg-limao-hover: #ddff55;
+  --rg-limao-ativo: #b4db10;
+  --rg-roxo: #8e6be0;
+  --rg-laranja: #d66d19;
+  --rg-texto: #f2f5f0;
+  --rg-texto-secundario: #a9b2a6;
+  --rg-fonte-titulo: 'Unbounded', 'Inter', system-ui, sans-serif;
+  --rg-fonte-texto: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+/* Cores e fontes no sistema de tokens do Bootstrap. */
+[data-bs-theme='dark'] {
+  --bs-body-font-family: var(--rg-fonte-texto);
+  --bs-body-bg: var(--rg-fundo);
+  --bs-body-bg-rgb: 10, 13, 10;
+  --bs-body-color: var(--rg-texto);
+  --bs-body-color-rgb: 242, 245, 240;
+  --bs-secondary-color: var(--rg-texto-secundario);
+  --bs-secondary-bg: var(--rg-superficie-2);
+  --bs-tertiary-bg: var(--rg-superficie);
+  --bs-border-color: var(--rg-borda);
+  --bs-primary: var(--rg-limao);
+  --bs-primary-rgb: 200, 243, 29;
+  --bs-link-color: var(--rg-limao);
+  --bs-link-color-rgb: 200, 243, 29;
+  --bs-link-hover-color: var(--rg-limao-hover);
+  --bs-link-hover-color-rgb: 221, 255, 85;
+  --bs-focus-ring-color: rgba(200, 243, 29, 0.35);
+}
+
+body { background-color: var(--rg-fundo); }
+
+h1, h2, h3, .h1, .h2, .h3 {
+  font-family: var(--rg-fonte-titulo);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+h1, .h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); }
+
+/* Marca: o ícone SVG é original, sem depender de imagens externas. */
+.rg-marca-texto {
+  font-family: var(--rg-fonte-titulo);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--rg-texto);
+}
+
+/* Ações principais — preserva os botões vermelhos de exclusão e seus significados. */
+.btn { --bs-btn-border-radius: 999px; font-weight: 600; }
+.btn-primary, .btn-success {
+  --bs-btn-color: #0a0d0a;
+  --bs-btn-bg: var(--rg-limao);
+  --bs-btn-border-color: var(--rg-limao);
+  --bs-btn-hover-color: #0a0d0a;
+  --bs-btn-hover-bg: var(--rg-limao-hover);
+  --bs-btn-hover-border-color: var(--rg-limao-hover);
+  --bs-btn-active-color: #0a0d0a;
+  --bs-btn-active-bg: var(--rg-limao-ativo);
+  --bs-btn-active-border-color: var(--rg-limao-ativo);
+  --bs-btn-disabled-color: #0a0d0a;
+  --bs-btn-disabled-bg: var(--rg-limao);
+  --bs-btn-disabled-border-color: var(--rg-limao);
+  --bs-btn-focus-shadow-rgb: 200, 243, 29;
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--rg-limao);
+  --bs-btn-border-color: var(--rg-limao);
+  --bs-btn-hover-color: #0a0d0a;
+  --bs-btn-hover-bg: var(--rg-limao);
+  --bs-btn-hover-border-color: var(--rg-limao);
+  --bs-btn-active-color: #0a0d0a;
+  --bs-btn-active-bg: var(--rg-limao-ativo);
+  --bs-btn-active-border-color: var(--rg-limao-ativo);
+  --bs-btn-disabled-color: var(--rg-limao);
+  --bs-btn-disabled-border-color: var(--rg-limao);
+}
+
+/* Formulários, cards e tabelas: visual consistente em todas as rotas. */
+.form-control, .form-select {
+  background-color: var(--rg-superficie-2);
+  border-color: var(--rg-borda-campo);
+  color: var(--rg-texto);
+}
+.form-control::placeholder { color: var(--rg-texto-secundario); opacity: 1; }
+.form-control:focus, .form-select:focus {
+  background-color: var(--rg-superficie-2);
+  color: var(--rg-texto);
+  border-color: var(--rg-limao);
+  box-shadow: 0 0 0 .2rem rgba(200,243,29,.23);
+}
+.card {
+  --bs-card-bg: var(--rg-superficie);
+  --bs-card-border-color: var(--rg-borda);
+  --bs-card-border-radius: 1rem;
+  --bs-card-inner-border-radius: calc(1rem - 1px);
+}
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-border-color: var(--rg-borda);
+  --bs-table-striped-bg: rgba(255,255,255,.03);
+  --bs-table-hover-bg: rgba(200,243,29,.06);
+}
+.dropdown-menu {
+  --bs-dropdown-bg: var(--rg-superficie);
+  --bs-dropdown-border-color: var(--rg-borda);
+  --bs-dropdown-link-color: var(--rg-texto);
+  --bs-dropdown-link-hover-color: #0a0d0a;
+  --bs-dropdown-link-hover-bg: var(--rg-limao);
+  --bs-dropdown-link-active-color: #0a0d0a;
+  --bs-dropdown-link-active-bg: var(--rg-limao);
+}
+
+/* O cabeçalho existente mantém sua estrutura até a UI02. */
+.navbar.bg-dark, footer.bg-dark { background-color: var(--rg-superficie) !important; }
+.navbar, footer.bg-dark { border-color: var(--rg-borda); }
+.navbar { border-bottom: 1px solid var(--rg-borda); }
+footer.bg-dark { border-top: 1px solid var(--rg-borda); }
+
+/* Foco por teclado, exigido pelo enunciado. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 3px solid var(--rg-limao);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

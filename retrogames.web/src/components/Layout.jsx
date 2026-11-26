@@ -1,9 +1,9 @@
-
 import { useState } from 'react'
 import { Link, Outlet, useNavigate } from 'react-router-dom'
 
 import { useAutenticacao } from '../hooks/useAutenticacao'
 import { obterMensagemErro } from '../api/erros'
+import Logo from './Logo'
 
 function Layout() {
   const {
@@ -38,8 +38,9 @@ function Layout() {
     <div className="d-flex flex-column min-vh-100">
       <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
         <div className="container">
-          <Link className="navbar-brand" to="/">
-            RetroGames
+          <Link className="navbar-brand d-flex align-items-center gap-2" to="/">
+            <Logo tamanho={36} />
+            <span className="rg-marca-texto">RetroGames</span>
           </Link>
 
           <div className="navbar-nav">
@@ -49,12 +50,9 @@ function Layout() {
           </div>
 
           <ul className="navbar-nav ms-auto d-flex flex-row flex-wrap align-items-center gap-3">
-
             {carregando && (
               <li className="nav-item">
-                <span className="navbar-text">
-                  Verificando sessão...
-                </span>
+                <span className="navbar-text">Verificando sessão...</span>
               </li>
             )}
 
@@ -69,19 +67,14 @@ function Layout() {
             {!carregando && estaAutenticado && (
               <>
                 {ehCliente && (
-                <>
+                  <>
                     <li className="nav-item">
-                    <Link className="nav-link" to="/carrinho">
-                        Carrinho
-                    </Link>
+                      <Link className="nav-link" to="/carrinho">Carrinho</Link>
                     </li>
-
                     <li className="nav-item">
-                    <Link className="nav-link" to="/meus-pedidos">
-                        Meus pedidos
-                    </Link>
+                      <Link className="nav-link" to="/meus-pedidos">Meus pedidos</Link>
                     </li>
-                </>
+                  </>
                 )}
 
                 {ehAdministrador && (
@@ -97,30 +90,17 @@ function Layout() {
 
                     <ul className="dropdown-menu dropdown-menu-dark">
                       <li>
-                        <Link
-                          className="dropdown-item"
-                          to="/admin/jogos"
-                        >
-                          Jogos
-                        </Link>
+                        <Link className="dropdown-item" to="/admin/jogos">Jogos</Link>
                       </li>
-
                       <li>
-                        <Link
-                          className="dropdown-item"
-                          to="/admin/plataformas"
-                        >
-                          Plataformas
-                        </Link>
+                        <Link className="dropdown-item" to="/admin/plataformas">Plataformas</Link>
                       </li>
                     </ul>
                   </li>
                 )}
 
                 <li className="nav-item">
-                  <span className="navbar-text">
-                    Olá, {usuario?.nome}
-                  </span>
+                  <span className="navbar-text">Olá, {usuario?.nome}</span>
                 </li>
 
                 <li className="nav-item">
@@ -141,17 +121,15 @@ function Layout() {
 
       <main className="container py-4 flex-grow-1">
         {erroSaida && (
-          <div className="alert alert-danger" role="alert">
-            {erroSaida}
-          </div>
+          <div className="alert alert-danger" role="alert">{erroSaida}</div>
         )}
-
         <Outlet />
       </main>
 
       <footer className="bg-dark text-white text-center py-3">
-        <div className="container">
-          RetroGames
+        <div className="container d-flex justify-content-center align-items-center gap-2">
+          <Logo tamanho={24} />
+          <span>RetroGames</span>
         </div>
       </footer>
     </div>
