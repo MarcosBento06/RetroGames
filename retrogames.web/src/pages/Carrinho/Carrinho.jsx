@@ -1,7 +1,5 @@
-
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-
 import { useCarrinho } from '../../hooks/useCarrinho'
 import { jogoApi } from '../../api/servicos'
 import { formatarPreco } from '../../lib/formato'
@@ -18,7 +16,6 @@ function Carrinho() {
 
   const [jogosPorId, setJogosPorId] = useState({})
   const [carregando, setCarregando] = useState(false)
-
   const [finalizando, setFinalizando] = useState(false)
   const [erroCompra, setErroCompra] = useState('')
   const [compraRealizada, setCompraRealizada] = useState(false)
@@ -75,13 +72,17 @@ function Carrinho() {
     return soma + Number(jogo.preco) * item.quantidade
   }, 0)
 
-  // Envia os itens do carrinho para a API de pedidos
-  async function finalizarCompra() {
-    if (finalizando || carregando || itens.length === 0) {
-      return
-    }
+  const possuiJogoIndisponivel = itens.some(
+    item => !jogosPorId[item.idJogo]
+  )
 
-    if (itens.some(item => !jogosPorId[item.idJogo])) {
+  async function finalizarCompra() {
+    if (
+      finalizando ||
+      carregando ||
+      itens.length === 0 ||
+      possuiJogoIndisponivel
+    ) {
       return
     }
 
@@ -92,12 +93,12 @@ function Carrinho() {
     try {
       await pedidoApi.finalizar(itens)
 
-      // Limpa o carrinho somente após a compra ter sucesso
+      // O carrinho só é limpo depois da confirmação de sucesso da API.
       limparCarrinho()
 
       setCompraRealizada(true)
     } catch (erro) {
-      // Mantém os itens no carrinho se a compra falhar
+      // Em caso de erro, os itens continuam no carrinho.
       setErroCompra(obterMensagemErro(erro))
     } finally {
       setFinalizando(false)
@@ -105,154 +106,248 @@ function Carrinho() {
   }
 
   return (
-    <div>
-      <h1 className="mb-4">Meu Carrinho</h1>
+    <section className="rg-carrinho">
+      <div className="rg-carrinho__cabecalho">
+        <div>
+          <span className="rg-carrinho__etiqueta">
+            SUA COMPRA
+          </span>
 
-      {/* Mensagem de erro ao finalizar */}
+          <h1 className="mb-2">Meu carrinho</h1>
+
+          <p className="text-secondary mb-0">
+            Confira os jogos, as quantidades e os valores antes de finalizar.
+          </p>
+        </div>
+
+        <span className="rg-carrinho__contador">
+          {itens.reduce(
+            (soma, item) => soma + item.quantidade,
+            0
+          )}{' '}
+          unidade(s)
+        </span>
+      </div>
+
       {erroCompra && (
-        <div className="alert alert-danger" role="alert">
-          {erroCompra}
+        <div
+          className="alert alert-danger rg-carrinho__mensagem"
+          role="alert"
+          aria-live="assertive"
+        >
+          <strong>Não foi possível finalizar a compra.</strong>
+          <p className="mb-0 mt-1">{erroCompra}</p>
+          <p className="mb-0 mt-2 small">
+            Seus itens continuam salvos no carrinho. Confira as
+            informações e tente novamente.
+          </p>
         </div>
       )}
 
-      {/* Mensagem de compra realizada */}
       {compraRealizada && (
-        <div className="alert alert-success" role="status">
-          Pedido realizado com sucesso!
+        <div
+          className="alert alert-success rg-carrinho__mensagem"
+          role="status"
+          aria-live="polite"
+        >
+          <strong>Compra realizada com sucesso!</strong>
+
+          <p className="mb-2 mt-1">
+            Seu pedido foi registrado. Você já pode acompanhar
+            os detalhes no histórico de compras.
+          </p>
+
+          <Link
+            to="/meus-pedidos"
+            className="btn btn-sm btn-outline-success"
+          >
+            Consultar meus pedidos
+          </Link>
         </div>
       )}
 
       {itens.length === 0 ? (
-        <div>
-          <p>Seu carrinho está vazio.</p>
+        <div className="rg-carrinho__vazio">
+          <div className="rg-carrinho__vazio-icone" aria-hidden="true">
+            🛒
+          </div>
+
+          <h2>Seu carrinho está vazio</h2>
+
+          <p className="text-secondary">
+            Explore nosso catálogo e encontre seu próximo clássico.
+          </p>
 
           <Link to="/" className="btn btn-primary">
             Ver catálogo
           </Link>
         </div>
       ) : carregando ? (
-        <p>Carregando jogos do carrinho...</p>
+        <div className="rg-carrinho__carregando" role="status">
+          <div
+            className="spinner-border text-primary"
+            aria-hidden="true"
+          />
+          <p className="mt-3 mb-0">
+            Carregando os jogos do seu carrinho...
+          </p>
+        </div>
       ) : (
         <>
-          <div className="table-responsive">
-            <table className="table align-middle">
-              <thead>
-                <tr>
-                  <th>Jogo</th>
-                  <th>Preço unitário</th>
-                  <th>Quantidade</th>
-                  <th>Subtotal</th>
-                  <th>Ações</th>
-                </tr>
-              </thead>
+          {possuiJogoIndisponivel && (
+            <div className="alert alert-warning" role="alert">
+              Não foi possível consultar todos os jogos.
+              Verifique sua conexão ou remova os itens indisponíveis
+              antes de finalizar.
+            </div>
+          )}
 
-              <tbody>
-                {itens.map(item => {
-                  const jogo = jogosPorId[item.idJogo]
+          <div className="rg-carrinho__painel">
+            <div className="rg-carrinho__painel-titulo">
+              <h2>Itens da compra</h2>
+              <span>{itens.length} jogo(s)</span>
+            </div>
 
-                  return (
-                    <tr key={item.idJogo}>
-                      <td>
-                        {jogo?.nome ??
-                          `Jogo indisponível (ID ${item.idJogo})`}
-                      </td>
+            <div className="table-responsive rg-carrinho__tabela-wrapper">
+              <table className="table align-middle rg-carrinho__tabela">
+                <caption className="visually-hidden">
+                  Jogos, preços, quantidades e subtotais do carrinho.
+                </caption>
 
-                      <td>
-                        {jogo
-                          ? formatarPreco(jogo.preco)
-                          : '—'}
-                      </td>
+                <thead>
+                  <tr>
+                    <th scope="col">Jogo</th>
+                    <th scope="col">Preço unitário</th>
+                    <th scope="col">Quantidade</th>
+                    <th scope="col">Subtotal</th>
+                    <th scope="col">Ações</th>
+                  </tr>
+                </thead>
 
-                      <td>
-                        <select
-                          className="form-select"
-                          style={{ maxWidth: '100px' }}
-                          value={item.quantidade}
-                          disabled={finalizando}
-                          aria-label={`Quantidade do jogo ${item.idJogo}`}
-                          onChange={evento =>
-                            alterarQuantidade(
-                              item.idJogo,
-                              Number(evento.target.value)
-                            )
-                          }
-                        >
-                          {Array.from(
-                            { length: 10 },
-                            (_, indice) => indice + 1
-                          ).map(quantidade => (
-                            <option
-                              key={quantidade}
-                              value={quantidade}
-                            >
-                              {quantidade}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
+                <tbody>
+                  {itens.map(item => {
+                    const jogo = jogosPorId[item.idJogo]
 
-                      <td>
-                        {jogo
-                          ? formatarPreco(
-                              Number(jogo.preco) * item.quantidade
-                            )
-                          : '—'}
-                      </td>
+                    return (
+                      <tr key={item.idJogo}>
+                        <td className="rg-carrinho__nome">
+                          <strong>
+                            {jogo?.nome ??
+                              `Jogo indisponível (ID ${item.idJogo})`}
+                          </strong>
+                        </td>
 
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-outline-danger btn-sm"
-                          onClick={() => removerJogo(item.idJogo)}
-                          disabled={finalizando}
-                        >
-                          Remover
-                        </button>
-                      </td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+                        <td>
+                          {jogo
+                            ? formatarPreco(jogo.preco)
+                            : '—'}
+                        </td>
+
+                        <td>
+                          <select
+                            className="form-select rg-carrinho__quantidade"
+                            value={item.quantidade}
+                            disabled={finalizando}
+                            aria-label={`Quantidade de ${jogo?.nome ?? 'jogo'}`}
+                            onChange={evento =>
+                              alterarQuantidade(
+                                item.idJogo,
+                                Number(evento.target.value)
+                              )
+                            }
+                          >
+                            {Array.from(
+                              { length: 10 },
+                              (_, indice) => indice + 1
+                            ).map(quantidade => (
+                              <option
+                                key={quantidade}
+                                value={quantidade}
+                              >
+                                {quantidade}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+
+                        <td className="rg-carrinho__subtotal">
+                          {jogo
+                            ? formatarPreco(
+                                Number(jogo.preco) * item.quantidade
+                              )
+                            : '—'}
+                        </td>
+
+                        <td>
+                          <button
+                            type="button"
+                            className="btn btn-outline-danger btn-sm"
+                            onClick={() => removerJogo(item.idJogo)}
+                            disabled={finalizando}
+                            aria-label={`Remover ${jogo?.nome ?? 'jogo'} do carrinho`}
+                          >
+                            Remover
+                          </button>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
 
-          <div className="text-end mt-4">
-            <h2 className="fs-4">
-              Total: {formatarPreco(total)}
-            </h2>
+          <div className="rg-carrinho__resumo">
+            <div>
+              <span className="rg-carrinho__resumo-legenda">
+                Total da compra
+              </span>
 
-            <p className="text-muted small">
-              O valor definitivo será calculado pelo servidor
-              ao finalizar a compra.
-            </p>
-          </div>
+              <strong className="rg-carrinho__total">
+                {formatarPreco(total)}
+              </strong>
 
-          <div className="d-flex flex-wrap gap-2">
-            <Link
-              to="/"
-              className="btn btn-outline-primary"
-            >
-              Continuar comprando
-            </Link>
+              <p className="text-secondary small mb-0">
+                O valor definitivo será calculado pelo servidor
+                ao finalizar a compra.
+              </p>
+            </div>
 
-            <button
-              type="button"
-              className="btn btn-success"
-              onClick={finalizarCompra}
-              disabled={
-                finalizando ||
-                carregando ||
-                itens.some(item => !jogosPorId[item.idJogo])
-              }
-            >
-              {finalizando
-                ? 'Finalizando...'
-                : 'Finalizar compra'}
-            </button>
+            <div className="rg-carrinho__acoes">
+              <Link
+                to="/"
+                className="btn btn-outline-primary"
+              >
+                Continuar comprando
+              </Link>
+
+              <button
+                type="button"
+                className="btn btn-success rg-carrinho__botao-finalizar"
+                onClick={finalizarCompra}
+                disabled={
+                  finalizando ||
+                  carregando ||
+                  possuiJogoIndisponivel
+                }
+              >
+                {finalizando ? (
+                  <>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      aria-hidden="true"
+                    />
+                    Enviando pedido...
+                  </>
+                ) : (
+                  'Finalizar compra'
+                )}
+              </button>
+            </div>
           </div>
         </>
       )}
-    </div>
+    </section>
   )
 }
 
