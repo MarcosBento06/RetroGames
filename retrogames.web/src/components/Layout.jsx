@@ -214,7 +214,7 @@ function Layout() {
                   <li className="nav-item">
                     <button
                       type="button"
-                      className="btn btn-outline-primary btn-sm"
+                      className="btn btn-outline-primary btn-sm rg-botao-sair"
                       onClick={realizarLogout}
                       disabled={saindo}
                     >

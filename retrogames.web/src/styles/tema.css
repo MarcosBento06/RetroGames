@@ -1236,3 +1236,44 @@ h1, .h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); }
     padding: 1rem;
   }
 }
+
+/* UI06 — Alinhamento dos textos nos botões */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+}
+
+/* UI06 — Botão Sair: formato retangular */
+.rg-botao-sair {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  min-width: 76px;
+  height: auto;
+  min-height: 38px;
+  aspect-ratio: auto;
+  padding: 0.5rem 1rem;
+  border-radius: 0.65rem;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+@media (max-width: 575.98px) {
+  .rg-botao-sair {
+    width: auto;
+    min-width: 76px;
+    height: auto;
+    min-height: 38px;
+    border-radius: 0.65rem;
+    padding: 0.5rem 1rem;
+  }
+}
