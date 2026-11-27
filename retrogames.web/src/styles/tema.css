@@ -255,3 +255,179 @@ h1, .h1 { font-size: clamp(1.5rem, 4vw, 2.1rem); }
     transition-duration: 0.01ms !important;
   }
 }
+
+
+/* UI03 (revisada) — Vitrine compacta, sem capas provisórias grandes. */
+.rg-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-bottom: 1.65rem;
+  padding: clamp(1.2rem, 3vw, 2rem) clamp(1.25rem, 3vw, 2.25rem);
+  border: 1px solid var(--rg-borda);
+  border-left: 4px solid var(--rg-limao);
+  border-radius: 1.15rem;
+  background:
+    radial-gradient(ellipse at 94% 10%, rgba(200, 243, 29, .10), transparent 42%),
+    linear-gradient(135deg, var(--rg-superficie-2), var(--rg-superficie));
+}
+.rg-hero__conteudo { max-width: 48rem; }
+.rg-hero__etiqueta {
+  margin-bottom: .45rem;
+  color: var(--rg-limao);
+  font-size: .74rem;
+  font-weight: 800;
+  letter-spacing: .10em;
+  text-transform: uppercase;
+}
+.rg-hero__titulo {
+  max-width: 43rem;
+  margin-bottom: .7rem;
+  font-size: clamp(1.4rem, 3.1vw, 2.3rem);
+  line-height: 1.25;
+  letter-spacing: -.035em;
+}
+.rg-hero__desc {
+  max-width: 42rem;
+  margin-bottom: 1.1rem;
+  color: var(--rg-texto-secundario);
+  font-size: .95rem;
+  line-height: 1.55;
+}
+.rg-hero__acoes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .65rem;
+}
+.rg-hero__acoes .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding-inline: 1.15rem;
+}
+.rg-titulo-secao {
+  scroll-margin-top: 6.5rem;
+  margin-top: .3rem;
+}
+.rg-titulo-secao:focus { outline: none; }
+
+/* Cards são informações de loja, não cartazes decorativos. */
+.rg-card {
+  position: relative;
+  overflow: hidden;
+  border-color: var(--rg-borda);
+  border-radius: 1.1rem;
+  background: var(--rg-superficie);
+  transition: border-color .16s ease, transform .16s ease, box-shadow .16s ease;
+}
+.rg-card::before {
+  content: '';
+  display: block;
+  height: 4px;
+  background: linear-gradient(90deg, var(--rg-limao), rgba(200, 243, 29, .24));
+}
+.rg-card:hover, .rg-card:focus-within {
+  transform: translateY(-2px);
+  border-color: var(--rg-limao);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .20);
+}
+.rg-card__corpo { padding: 1.3rem; }
+.rg-card__cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .5rem;
+}
+.rg-card__plataforma {
+  display: inline-block;
+  max-width: 100%;
+  padding: .3rem .65rem;
+  border: 1px solid var(--rg-borda-campo);
+  border-radius: 999px;
+  color: var(--rg-texto-secundario);
+  font-size: .75rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.rg-card__titulo {
+  margin: 1.05rem 0 .65rem;
+  color: var(--rg-texto);
+  font-family: var(--rg-fonte-titulo);
+  font-size: clamp(1rem, 1.5vw, 1.14rem);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.rg-card__detalhes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: .25rem .5rem;
+  margin-bottom: 1rem;
+  color: var(--rg-texto-secundario);
+  font-size: .83rem;
+  line-height: 1.45;
+}
+.rg-card__separador { color: var(--rg-limao); }
+.rg-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: .22rem .6rem;
+  border: 1px solid var(--rg-borda-campo);
+  border-radius: 999px;
+  color: var(--rg-texto-secundario);
+  font-size: .74rem;
+  font-weight: 600;
+}
+.rg-card__rodape { padding-top: .55rem; }
+.rg-card .btn { min-height: 44px; }
+.rg-preco {
+  color: var(--rg-limao);
+  font-size: 1.38rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+/* Paginação UI03 mantida, inclusive em telas estreitas. */
+.rg-paginacao { max-width: 100%; }
+.rg-paginacao .pagination { margin-bottom: .35rem; }
+.rg-paginacao .page-link {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 1px solid var(--rg-borda-campo);
+  border-radius: .65rem;
+  background: var(--rg-superficie);
+  color: var(--rg-texto);
+  font-weight: 700;
+}
+.rg-paginacao .page-item:not(.disabled) .page-link:hover,
+.rg-paginacao .page-item.active .page-link {
+  background: var(--rg-limao);
+  color: var(--rg-fundo);
+  border-color: var(--rg-limao);
+}
+.rg-paginacao .page-item.disabled .page-link {
+  background: var(--rg-superficie);
+  color: var(--rg-texto-secundario);
+  opacity: .7;
+}
+.rg-paginacao__resumo { color: var(--rg-texto-secundario); font-size: .85rem; }
+
+@media (max-width: 575.98px) {
+  .rg-hero { padding: 1.1rem 1rem; border-radius: .9rem; }
+  .rg-hero__titulo { font-size: 1.48rem; }
+  .rg-hero__desc { font-size: .88rem; }
+  .rg-hero__acoes .btn { flex: 1 1 122px; }
+  .rg-card__corpo { padding: 1.15rem; }
+  .rg-paginacao .page-link { min-width: 43px; min-height: 44px; padding: .4rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rg-card { transition: none; }
+  .rg-card:hover, .rg-card:focus-within { transform: none; }
+}
