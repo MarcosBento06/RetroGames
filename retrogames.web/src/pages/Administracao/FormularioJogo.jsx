@@ -1,19 +1,15 @@
-
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-
 import {
   jogoApi,
   plataformaApi,
   generoApi,
   condicaoJogoApi
 } from '../../api/servicos'
-
 import {
   obterMensagemErro,
   obterErrosDosCampos
 } from '../../api/erros'
-
 import {
   Carregando,
   MensagemErro
@@ -200,12 +196,12 @@ function FormularioJogo() {
   }
 
   return (
-    <div>
+    <section className="rg-admin">
       <h1 className="mb-4">
         {emEdicao ? 'Editar Jogo' : 'Cadastrar Jogo'}
       </h1>
 
-      <form onSubmit={salvarJogo} noValidate>
+      <form onSubmit={salvarJogo} noValidate className="rg-admin__formulario">
         <div className="row g-3">
 
           <div className="col-12">
@@ -488,7 +484,7 @@ function FormularioJogo() {
           </Link>
         </div>
       </form>
-    </div>
+    </section>
   )
 }
 

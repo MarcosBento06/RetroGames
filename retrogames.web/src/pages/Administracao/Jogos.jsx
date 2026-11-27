@@ -1,7 +1,5 @@
-
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-
 import { jogoApi } from '../../api/servicos'
 import { obterMensagemErro } from '../../api/erros'
 
@@ -129,8 +127,8 @@ function Jogos() {
   }
 
   return (
-    <div>
-      <div className="d-flex justify-content-between align-items-center mb-4">
+    <section className="rg-admin">
+      <div className="rg-admin__cabecalho">
         <h1 className="mb-0">
           Administração de Jogos
         </h1>
@@ -143,7 +141,7 @@ function Jogos() {
         </Link>
       </div>
 
-      <form onSubmit={realizarBusca} className="mb-4">
+      <form onSubmit={realizarBusca} className="rg-admin__busca">
         <div className="input-group">
           <input
             key={busca}
@@ -245,7 +243,7 @@ function Jogos() {
           />
         </>
       )}
-    </div>
+    </section>
   )
 }
 

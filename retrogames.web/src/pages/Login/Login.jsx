@@ -1,7 +1,5 @@
-
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-
 import { useAutenticacao } from '../../hooks/useAutenticacao'
 import { obterMensagemErro } from '../../api/erros'
 
@@ -43,11 +41,20 @@ function Login() {
   }
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-12 col-md-6 col-lg-4">
-        <h1 className="text-center mb-4">
-          Entrar no RetroGames
-        </h1>
+    <section className="rg-autenticacao">
+      <div className="rg-autenticacao__painel">
+        <header className="rg-autenticacao__cabecalho">
+          <span className="rg-autenticacao__etiqueta">
+            BEM-VINDO DE VOLTA
+          </span>
+
+          <h1>Entrar no RetroGames</h1>
+
+          <p>
+            Acesse sua conta para acompanhar suas compras e
+            aproveitar nossa coleção de jogos.
+          </p>
+        </header>
 
         <form onSubmit={realizarLogin}>
           <div className="mb-3">
@@ -58,11 +65,10 @@ function Login() {
             <input
               id="email"
               type="email"
-              className="form-control"
+              className="form-control rg-campo"
               value={email}
-              onChange={(evento) =>
-                setEmail(evento.target.value)
-              }
+              onChange={(evento) => setEmail(evento.target.value)}
+              autoComplete="email"
               required
               disabled={enviando}
             />
@@ -76,33 +82,37 @@ function Login() {
             <input
               id="senha"
               type="password"
-              className="form-control"
+              className="form-control rg-campo"
               value={senha}
-              onChange={(evento) =>
-                setSenha(evento.target.value)
-              }
+              onChange={(evento) => setSenha(evento.target.value)}
+              autoComplete="current-password"
               required
               disabled={enviando}
             />
           </div>
 
           {erro && (
-            <div className="alert alert-danger" role="alert">
+            <div
+              className="alert alert-danger rg-formulario__erro"
+              role="alert"
+              aria-live="assertive"
+            >
               {erro}
             </div>
           )}
 
           <button
             type="submit"
-            className="btn btn-primary w-100"
+            className="btn btn-primary w-100 rg-autenticacao__botao"
             disabled={enviando}
           >
             {enviando ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
 
-        <p className="text-center mt-3">
-          Ainda não possui uma conta?{' '}
+        <div className="rg-autenticacao__rodape">
+          <span>Ainda não possui uma conta?</span>
+
           <Link
             to={
               voltarPara
@@ -112,10 +122,9 @@ function Login() {
           >
             Criar conta
           </Link>
-        </p>
-
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 

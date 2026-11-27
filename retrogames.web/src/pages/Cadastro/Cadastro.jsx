@@ -1,7 +1,5 @@
-
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-
 import { useAutenticacao } from '../../hooks/useAutenticacao'
 import { obterMensagemErro } from '../../api/erros'
 
@@ -43,11 +41,19 @@ function Cadastro() {
   }
 
   return (
-    <div className="row justify-content-center">
-      <div className="col-12 col-md-6 col-lg-4">
-        <h1 className="text-center mb-4">
-          Criar conta no RetroGames
-        </h1>
+    <section className="rg-autenticacao">
+      <div className="rg-autenticacao__painel">
+        <header className="rg-autenticacao__cabecalho">
+          <span className="rg-autenticacao__etiqueta">
+            FAÇA PARTE DA COMUNIDADE
+          </span>
+
+          <h1>Criar conta no RetroGames</h1>
+
+          <p>
+            Cadastre-se para realizar compras e acompanhar seus pedidos.
+          </p>
+        </header>
 
         <form onSubmit={realizarCadastro}>
           <div className="mb-3">
@@ -58,9 +64,10 @@ function Cadastro() {
             <input
               id="nome"
               type="text"
-              className="form-control"
+              className="form-control rg-campo"
               value={nome}
               onChange={(evento) => setNome(evento.target.value)}
+              autoComplete="name"
               required
               disabled={enviando}
             />
@@ -74,9 +81,10 @@ function Cadastro() {
             <input
               id="email"
               type="email"
-              className="form-control"
+              className="form-control rg-campo"
               value={email}
               onChange={(evento) => setEmail(evento.target.value)}
+              autoComplete="email"
               required
               disabled={enviando}
             />
@@ -90,31 +98,37 @@ function Cadastro() {
             <input
               id="senha"
               type="password"
-              className="form-control"
+              className="form-control rg-campo"
               value={senha}
               onChange={(evento) => setSenha(evento.target.value)}
+              autoComplete="new-password"
               required
               disabled={enviando}
             />
           </div>
 
           {erro && (
-            <div className="alert alert-danger" role="alert">
+            <div
+              className="alert alert-danger rg-formulario__erro"
+              role="alert"
+              aria-live="assertive"
+            >
               {erro}
             </div>
           )}
 
           <button
             type="submit"
-            className="btn btn-primary w-100"
+            className="btn btn-primary w-100 rg-autenticacao__botao"
             disabled={enviando}
           >
             {enviando ? 'Cadastrando...' : 'Criar conta'}
           </button>
         </form>
 
-        <p className="text-center mt-3">
-          Já possui uma conta?{' '}
+        <div className="rg-autenticacao__rodape">
+          <span>Já possui uma conta?</span>
+
           <Link
             to={
               voltarPara
@@ -124,9 +138,9 @@ function Cadastro() {
           >
             Entrar
           </Link>
-        </p>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }
 

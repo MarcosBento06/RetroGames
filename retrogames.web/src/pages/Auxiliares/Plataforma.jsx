@@ -1,12 +1,9 @@
-
 import { useEffect, useState } from 'react'
-
 import { plataformaApi } from '../../api/servicos'
 import {
   obterMensagemErro,
   obterErrosDosCampos
 } from '../../api/erros'
-
 import {
   Carregando,
   MensagemErro,
@@ -164,13 +161,13 @@ function Plataforma() {
 
 
   return (
-    <div>
+    <section className="rg-admin">
       <h1 className="mb-4">
         Administração de Plataformas
       </h1>
 
       {/* Formulário de inclusão e alteração */}
-      <div className="card mb-4">
+      <div className="card rg-admin__painel mb-4">
         <div className="card-body">
           <h2 className="h5 mb-3">
             {idEmEdicao !== null
@@ -299,7 +296,7 @@ function Plataforma() {
       </h2>
 
       {erroExclusao && (
-        <div className="alert alert-danger" role="alert">
+        <div className="alert alert-danger rg-formulario__erro" role="alert">
             {erroExclusao}
         </div>
       )}
@@ -364,7 +361,7 @@ function Plataforma() {
           </table>
         </div>
       )}
-    </div>
+    </section>
   )
 }
 

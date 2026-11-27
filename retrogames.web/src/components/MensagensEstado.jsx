@@ -1,33 +1,94 @@
-
-export function Carregando() {
+export function Carregando({ texto = 'Carregando...' }) {
   return (
-    <div className="text-center my-4" role="status">
-      <div className="spinner-border text-primary" aria-hidden="true" />
-      <p className="mt-2">Carregando...</p>
+    <div
+      className="rg-estado rg-estado--carregando"
+      role="status"
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div
+        className="spinner-border text-primary rg-estado__spinner"
+        aria-hidden="true"
+      />
+
+      <p className="rg-estado__texto">
+        {texto}
+      </p>
     </div>
   )
 }
 
-export function MensagemErro({ mensagem, onTentarNovamente }) {
-  return (
-    <div className="alert alert-danger" role="alert">
-      <p>{mensagem}</p>
+export function MensagemErro({
+  mensagem,
+  aoTentarNovamente,
+  onTentarNovamente
+}) {
+  const tentarNovamente =
+    aoTentarNovamente ?? onTentarNovamente
 
-      <button
-        type="button"
-        className="btn btn-outline-danger"
-        onClick={onTentarNovamente}
-      >
-        Tentar novamente
-      </button>
-    </div>
+  return (
+    <section
+      className="rg-estado rg-estado--erro"
+      role="alert"
+      aria-live="assertive"
+    >
+      <span className="rg-estado__icone" aria-hidden="true">
+        !
+      </span>
+
+      <div className="rg-estado__conteudo">
+        <h2 className="rg-estado__titulo">
+          Não foi possível concluir a operação
+        </h2>
+
+        <p className="rg-estado__texto">
+          {mensagem}
+        </p>
+
+        {tentarNovamente && (
+          <button
+            type="button"
+            className="btn btn-outline-danger"
+            onClick={tentarNovamente}
+          >
+            Tentar novamente
+          </button>
+        )}
+      </div>
+    </section>
   )
 }
 
-export function EstadoVazio({ mensagem = 'Nenhum resultado encontrado.' }) {
+export function EstadoVazio({
+  titulo,
+  mensagem,
+  children
+}) {
+  const texto = mensagem ?? children
+
   return (
-    <div className="alert alert-info">
-      {mensagem}
-    </div>
+    <section className="rg-estado rg-estado--vazio">
+      <span className="rg-estado__icone" aria-hidden="true">
+        —
+      </span>
+
+      <div className="rg-estado__conteudo">
+        <h2 className="rg-estado__titulo">
+          {titulo ?? mensagem ?? 'Nenhum resultado encontrado.'}
+        </h2>
+
+        {titulo && mensagem && (
+          <p className="rg-estado__texto">
+            {mensagem}
+          </p>
+        )}
+
+        {titulo && children && (
+          <div className="rg-estado__texto">
+            {children}
+          </div>
+        )}
+      </div>
+    </section>
   )
 }

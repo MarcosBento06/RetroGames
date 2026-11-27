@@ -1,7 +1,5 @@
-
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-
 import { jogoApi } from '../../api/servicos'
 import { obterMensagemErro } from '../../api/erros'
 import { formatarPreco } from '../../lib/formato'
@@ -23,7 +21,7 @@ function DetalheJogo() {
   const [tentativas, setTentativas] = useState(0)
 
   const quantidadeNoCarrinho =
-  itens.find(item => item.idJogo === jogo?.id)?.quantidade ?? 0
+    itens.find(item => item.idJogo === jogo?.id)?.quantidade ?? 0
 
   useEffect(() => {
     let ativo = true
@@ -58,96 +56,117 @@ function DetalheJogo() {
   }, [id, tentativas])
 
   return (
-    <div>
-      <h1 className="mb-4">Detalhes do Jogo</h1>
+    <section className="rg-detalhe">
+      <header className="rg-detalhe__cabecalho">
+        <span className="rg-detalhe__etiqueta">
+          CATÁLOGO RETROGAMES
+        </span>
+
+        <h1>Detalhes do jogo</h1>
+      </header>
 
       {carregando ? (
-        <Carregando />
+        <Carregando texto="Carregando detalhes do jogo..." />
       ) : erro ? (
         <MensagemErro
           mensagem={erro}
           onTentarNovamente={() =>
-            setTentativas((valor) => valor + 1)
+            setTentativas(valor => valor + 1)
           }
         />
       ) : !jogo ? (
         <EstadoVazio mensagem="Jogo não encontrado." />
       ) : (
-        <div className="card">
-          <div className="card-body">
-            <h2 className="card-title">
-              {jogo.nome}
-            </h2>
-
-            <p>
-              <strong>Plataforma:</strong> {jogo.nomePlataforma}
-            </p>
-
-            <p>
-              <strong>Condição:</strong> {jogo.descricaoCondicao}
-            </p>
-
-            <p>
-              <strong>Ano de lançamento:</strong> {jogo.anoLancamento}
-            </p>
-
-            <p>
-              <strong>Gêneros:</strong>{' '}
-              {jogo.generos?.map((genero) => genero.nome).join(', ')
-                || 'Não informados'}
-            </p>
-
-            <p>
-              <strong>Descrição:</strong>{' '}
-              {jogo.descricao || 'Descrição não informada.'}
-            </p>
-
-            <p className="fs-4 fw-bold">
-              {formatarPreco(jogo.preco)}
-            </p>
-
-            <p>
-              <strong>Estoque:</strong> {jogo.estoque}
-            </p>
-
-            {jogo.estoque === 0 && (
-              <span className="badge bg-danger">
-                Esgotado
+        <article className="card rg-detalhe__card">
+          <div className="card-body rg-detalhe__corpo">
+            <div className="rg-detalhe__informacoes">
+              <span className="rg-detalhe__plataforma">
+                {jogo.nomePlataforma}
               </span>
-            )}
 
-            <div className="mt-3">
-              <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => adicionarJogo(jogo.id)}
-                disabled={
-                  jogo.estoque <= 0 ||
-                  quantidadeNoCarrinho >= 10
-                }
-              >
-                {jogo.estoque <= 0
-                  ? 'Esgotado'
-                  : quantidadeNoCarrinho >= 10
-                    ? 'Limite de 10 unidades'
-                    : 'Adicionar ao carrinho'}
-              </button>
+              <h2 className="rg-detalhe__titulo">
+                {jogo.nome}
+              </h2>
 
-              {quantidadeNoCarrinho > 0 && (
-                <p className="text-success mt-2 mb-0">
-                  No carrinho: {quantidadeNoCarrinho} unidade(s).
-                </p>
-              )}
+              <p className="rg-detalhe__descricao">
+                {jogo.descricao || 'Descrição não informada.'}
+              </p>
             </div>
 
+            <div className="rg-detalhe__dados">
+              <div className="rg-detalhe__dado">
+                <span>Condição</span>
+                <strong>{jogo.descricaoCondicao}</strong>
+              </div>
+
+              <div className="rg-detalhe__dado">
+                <span>Ano de lançamento</span>
+                <strong>{jogo.anoLancamento}</strong>
+              </div>
+
+              <div className="rg-detalhe__dado">
+                <span>Gêneros</span>
+                <strong>
+                  {jogo.generos?.map(genero => genero.nome).join(', ')
+                    || 'Não informados'}
+                </strong>
+              </div>
+
+              <div className="rg-detalhe__dado">
+                <span>Estoque disponível</span>
+                <strong>{jogo.estoque}</strong>
+              </div>
+            </div>
+
+            <div className="rg-detalhe__compra">
+              <div>
+                <span className="rg-detalhe__preco-legenda">
+                  Preço
+                </span>
+
+                <strong className="rg-detalhe__preco">
+                  {formatarPreco(jogo.preco)}
+                </strong>
+
+                {jogo.estoque === 0 && (
+                  <span className="rg-detalhe__esgotado">
+                    Esgotado
+                  </span>
+                )}
+              </div>
+
+              <div className="rg-detalhe__acoes">
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={() => adicionarJogo(jogo.id)}
+                  disabled={
+                    jogo.estoque <= 0 ||
+                    quantidadeNoCarrinho >= 10
+                  }
+                >
+                  {jogo.estoque <= 0
+                    ? 'Esgotado'
+                    : quantidadeNoCarrinho >= 10
+                      ? 'Limite de 10 unidades'
+                      : 'Adicionar ao carrinho'}
+                </button>
+
+                {quantidadeNoCarrinho > 0 && (
+                  <p className="text-success mb-0">
+                    No carrinho: {quantidadeNoCarrinho} unidade(s).
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
-        </div>
+        </article>
       )}
 
       <Link to="/" className="btn btn-outline-primary mt-4">
         Voltar ao catálogo
       </Link>
-    </div>
+    </section>
   )
 }
 
