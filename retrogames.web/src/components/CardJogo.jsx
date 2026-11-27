@@ -1,58 +1,60 @@
-
 import { Link } from 'react-router-dom'
 import { formatarPreco } from '../lib/formato'
 
 function CardJogo({ jogo }) {
-  const esgotado = jogo.estoque === 0
+  const esgotado = jogo.estoque <= 0
 
   return (
-    <div className="card h-100">
-      <div className="card-body d-flex flex-column">
-        <p className="text-muted mb-2">
-          {jogo.nomePlataforma}
-        </p>
+    <article className="card rg-card h-100">
+      <div className="card-body rg-card__corpo d-flex flex-column">
+        <div className="rg-card__cabecalho">
+          <span className="rg-card__plataforma" title={jogo.nomePlataforma}>
+            {jogo.nomePlataforma}
+          </span>
 
-        <h2 className="card-title h5">
+          {esgotado && (
+            <span className="badge text-bg-danger">Esgotado</span>
+          )}
+        </div>
+
+        <h2 className="card-title rg-card__titulo">
           {jogo.nome}
         </h2>
 
-        <p className="card-text">
-          <strong>Ano:</strong> {jogo.anoLancamento}
+        <p className="rg-card__detalhes">
+          <span>Ano {jogo.anoLancamento}</span>
+          <span className="rg-card__separador" aria-hidden="true">·</span>
+          <span>Condição: {jogo.descricaoCondicao}</span>
         </p>
 
-        <p className="card-text">
-          <strong>Condição:</strong> {jogo.descricaoCondicao}
-        </p>
+        {jogo.generos?.length > 0 && (
+          <div className="d-flex flex-wrap gap-2 mb-3">
+            {jogo.generos.map((genero, indice) => {
+              const nome = typeof genero === 'string' ? genero : genero.nome
 
-        <div className="mb-3">
-          {jogo.generos?.map((genero) => (
-            <span
-              key={genero}
-              className="badge bg-secondary me-1"
-            >
-              {genero}
-            </span>
-          ))}
-        </div>
-
-        <p className="fs-5 fw-bold mt-auto">
-          {formatarPreco(jogo.preco)}
-        </p>
-
-        {esgotado && (
-          <span className="badge bg-danger mb-3 align-self-start">
-            Esgotado
-          </span>
+              return (
+                <span key={`${nome}-${indice}`} className="rg-chip">
+                  {nome}
+                </span>
+              )
+            })}
+          </div>
         )}
 
-        <Link
-          to={`/jogos/${jogo.id}`}
-          className="btn btn-primary"
-        >
-          Ver detalhes
-        </Link>
+        <div className="rg-card__rodape mt-auto">
+          <p className="rg-preco mb-3">
+            {formatarPreco(jogo.preco)}
+          </p>
+
+          <Link
+            to={`/jogos/${jogo.id}`}
+            className="btn btn-primary w-100"
+          >
+            Ver detalhes
+          </Link>
+        </div>
       </div>
-    </div>
+    </article>
   )
 }
 

@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
@@ -169,7 +168,13 @@ function Catalogo() {
 
   return (
     <div>
-      <h1 className="mb-4">Catálogo de Jogos</h1>
+      <h1
+        id="jogos"
+        tabIndex={-1}
+        className="rg-titulo-secao mb-4"
+      >
+        Catálogo de Jogos
+      </h1>
 
       <form onSubmit={pesquisar} className="row g-3 mb-4">
         <div className="col-md-6">
